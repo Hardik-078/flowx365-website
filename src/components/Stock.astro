@@ -1,0 +1,570 @@
+---
+import AppFrame from './ui/AppFrame.astro';
+import Icon from './ui/Icon.astro';
+import { customer, docs } from '../data/sample';
+
+const trail = [
+  { kind: 'Purchase requisition', no: 'AE/26-27/PR/044', status: 'Converted', tone: 'indigo', note: 'Raised by stores' },
+  { kind: 'Purchase order', no: 'AE/26-27/PO/063', status: 'Partially received', tone: 'amber', note: '36 of 60 coils received' },
+  { kind: 'Goods receipt', no: 'AE/26-27/GRN/051', status: 'Posted', tone: 'green', note: '+36 coils into Main godown', counts: true },
+  { kind: 'Goods receipt', no: 'AE/26-27/GRN/052', status: 'Draft', tone: 'slate', note: 'Not in stock until it is posted', counts: false },
+];
+
+const health = [
+  { label: 'In stock', n: 146, color: '#16a34a' },
+  { label: 'Low stock', n: 22, color: '#ca8a04' },
+  { label: 'Critical', n: 9, color: '#ea580c' },
+  { label: 'Out of stock', n: 4, color: '#dc2626' },
+];
+const healthTotal = health.reduce((a, h) => a + h.n, 0);
+const R = 42;
+const C = 2 * Math.PI * R;
+let acc = 0;
+const arcs = health.map((h) => {
+  const len = (h.n / healthTotal) * C;
+  const arc = { ...h, len, offset: -acc };
+  acc += len;
+  return arc;
+});
+
+const warehouses = [
+  { name: 'Main godown', v: 42.6 },
+  { name: 'City store', v: 11.8 },
+  { name: 'Site store, Puri', v: 6.1 },
+];
+
+const pendingGrn = [
+  { po: 'AE/26-27/PO/063', sup: 'Utkal Cables & Wires', wh: 'Main godown', pending: 24, due: '26 Sep', s: 'Partially received', tone: 'amber' },
+  { po: 'AE/26-27/PO/067', sup: 'Shree Switchgear Co.', wh: 'Main godown', pending: 120, due: '29 Sep', s: 'Approved', tone: 'green' },
+  { po: 'AE/26-27/PO/070', sup: 'Deccan Fans Pvt Ltd', wh: 'City store', pending: 36, due: '02 Oct', s: 'Approved', tone: 'green' },
+];
+
+const transit = [
+  { dn: docs.deliveryNote, cust: customer.name, wh: 'Main godown', date: '15 Sep', qty: 104, s: 'Dispatched' },
+  { dn: 'AE/26-27/DN/099', cust: 'Konark Hotels & Resorts', wh: 'City store', date: '22 Sep', qty: 18, s: 'Dispatched' },
+];
+---
+
+<section class="sheet stock-section" id="stock" data-copy="triplicate" data-nav="light" data-chapter="No. 05 · Purchase & stock" aria-labelledby="stock-title">
+  <span class="perf" aria-hidden="true" style="--hole: var(--duplicate)"></span>
+  <div class="stub" aria-hidden="true"><span class="serial">No. 05 · Triplicate</span></div>
+
+  <div class="sheet-inner">
+    <h2 class="display-l stock-title" id="stock-title" data-reveal="mask">Stock moves when the paperwork does.</h2>
+  <div class="layout">
+    <div class="copy">
+      <p class="lede" data-reveal style="--i: 2">
+        Requisition, purchase order, goods receipt. Stock goes up when a receipt is posted, never on a
+        draft. On the way out it is reserved at dispatch and issued on delivery, so the number on
+        screen is the number on the shelf.
+      </p>
+
+      <ol class="receipts" aria-label="A purchase, receipt by receipt">
+        {
+          trail.map((t, i) => (
+            <li data-reveal style={`--i: ${i + 2}`} class:list={[{ dim: t.counts === false }]}>
+              <p class="r-kind">{t.kind}</p>
+              <p class="r-no serial">{t.no}</p>
+              <p class="r-status">
+                <span class="badge" data-tone={t.tone}>{t.status}</span>
+              </p>
+              <p class:list={['r-note', { plus: t.counts }]}>{t.note}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="visual" data-reveal style="--i: 1">
+      <AppFrame
+        label="FlowX365 Real-Time Stock Tracking screen, with illustrative data"
+        group="INVENTORY"
+        items={['Items', 'Real Time Stock Tracking', 'Warehouse Management', 'Stock Transfer Management']}
+        active="Real Time Stock Tracking"
+        crumb={['Inventory', 'Real-Time Stock Tracking']}
+        sidebar={false}
+      >
+        <div class="stk" data-stk>
+          <div class="panels">
+            <div class="card">
+              <p class="card-title">Stock health</p>
+              <div class="donut-wrap">
+                <svg viewBox="0 0 100 100" class="donut" role="img" aria-label={health.map((h) => `${h.label} ${h.n}`).join(', ')}>
+                  <circle cx="50" cy="50" r={R} class="donut-bg" />
+                  {arcs.map((a, i) => (
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={R}
+                      class="arc"
+                      stroke={a.color}
+                      stroke-dasharray={`${a.len - 1.2} ${C}`}
+                      stroke-dashoffset={a.offset}
+                      style={`--len: ${a.len}; --d: ${i * 120}ms`}
+                    />
+                  ))}
+                  <text x="50" y="49" text-anchor="middle" class="d-n">{healthTotal}</text>
+                  <text x="50" y="61" text-anchor="middle" class="d-l">items</text>
+                </svg>
+                <ul class="legend">
+                  {health.map((h) => (
+                    <li><i style={`background: ${h.color}`} />{h.label}<span class="num">{h.n}</span></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div class="card">
+              <p class="card-title">Warehouse distribution</p>
+              <ul class="wbars">
+                {warehouses.map((w, i) => (
+                  <li>
+                    <span class="wb-name">{w.name}</span>
+                    <span class="wb-v num">₹{w.v}L</span>
+                    <span class="wb-track"><span class="wb-fill" style={`--w: ${w.v / 45}; --d: ${i * 90}ms`} /></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div class="card pipeline">
+            <div class="pipe-head">
+              <p class="card-title">Inventory pipeline</p>
+              <fieldset class="seg">
+                <legend class="visually-hidden">Show</legend>
+                <label><input type="radio" name="pipe" id="pipe-grn" checked /><Icon name="box" size={14} />Pending GRNs <span class="cnt">{pendingGrn.length}</span></label>
+                <label><input type="radio" name="pipe" id="pipe-transit" /><Icon name="truck" size={14} />In transit <span class="cnt">{transit.length}</span></label>
+              </fieldset>
+            </div>
+
+            <div class="tbl-wrap view-grn">
+              <table class="tbl">
+                <caption class="visually-hidden">Purchase orders awaiting goods receipt</caption>
+                <thead><tr><th scope="col">PO number</th><th scope="col">Supplier</th><th scope="col" class="r">Pending</th><th scope="col">Expected</th><th scope="col">Status</th></tr></thead>
+                <tbody>
+                  {pendingGrn.map((r) => (
+                    <tr><td class="serial">{r.po}</td><td class="b">{r.sup}</td><td class="r num">{r.pending}</td><td>{r.due}</td><td><span class="badge" data-tone={r.tone}>{r.s}</span></td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="tbl-wrap view-transit">
+              <table class="tbl">
+                <caption class="visually-hidden">Deliveries dispatched and not yet delivered</caption>
+                <thead><tr><th scope="col">Delivery note</th><th scope="col">Customer</th><th scope="col">Dispatched</th><th scope="col" class="r">Qty</th><th scope="col">Status</th></tr></thead>
+                <tbody>
+                  {transit.map((r) => (
+                    <tr><td class="serial">{r.dn}</td><td class="b">{r.cust}</td><td>{r.date}</td><td class="r num">{r.qty}</td><td><span class="badge" data-tone="amber">{r.s}</span></td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p class="illustrative">Illustrative data · the toggle works</p>
+        </div>
+      </AppFrame>
+    </div>
+  </div>
+  </div>
+</section>
+
+<style>
+  .stock-section {
+    padding: var(--section) 0;
+    overflow-x: clip;
+  }
+
+  .stock-title {
+    max-width: 12ch;
+  }
+
+  /* The screen leads on this sheet; the copy follows on the right. */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: clamp(2.5rem, 5vw, 6rem);
+    align-items: start;
+    margin-top: clamp(3rem, 6vw, 5.5rem);
+  }
+
+  .copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .copy .lede {
+    color: var(--ink-2);
+  }
+
+  /* A purchase, receipt by receipt: the paperwork that moves stock. */
+  .receipts {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    border-top: 2px solid var(--ink);
+  }
+
+  .receipts li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 1rem;
+    row-gap: 0.15rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .r-kind {
+    font-weight: 700;
+  }
+
+  .r-no {
+    grid-column: 1;
+    color: var(--ink-3);
+  }
+
+  .r-status {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+
+  .r-note {
+    grid-column: 1 / -1;
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .r-note.plus {
+    color: var(--carbon);
+    font-weight: 650;
+  }
+
+  .receipts li.dim .r-kind,
+  .receipts li.dim .r-no,
+  .receipts li.dim .r-note {
+    color: var(--ink-3);
+  }
+
+  .visual {
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    top: calc(var(--nav-h) + 2rem);
+  }
+
+  /* ── The screen ─────────────────────────────────────────── */
+  .stk {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .panels {
+    display: grid;
+    grid-template-columns: 4fr 6fr;
+    gap: 0.75rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    padding: 0.9rem;
+    min-width: 0;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-text-2);
+  }
+
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.6rem;
+  }
+
+  .donut {
+    width: 112px;
+    height: 112px;
+    flex: none;
+    transform: rotate(-90deg);
+  }
+
+  .donut text {
+    transform: rotate(90deg);
+    transform-origin: 50px 50px;
+  }
+
+  .donut-bg {
+    fill: none;
+    stroke: #f1f4f9;
+    stroke-width: 11;
+  }
+
+  .arc {
+    fill: none;
+    stroke-width: 11;
+  }
+
+  :global(.js) .arc {
+    stroke-dasharray: 0 999;
+    transition: stroke-dasharray 900ms var(--ease-out);
+    transition-delay: var(--d);
+  }
+
+  :global(.js) [data-stk][data-visible] .arc {
+    stroke-dasharray: calc(var(--len) * 1px - 1.2px) 999;
+  }
+
+  .d-n {
+    font-size: 19px;
+    font-weight: 800;
+    fill: var(--app-text);
+    font-family: var(--font);
+  }
+
+  .d-l {
+    font-size: 8.5px;
+    fill: var(--app-muted);
+    font-family: var(--font);
+  }
+
+  .legend {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .legend li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
+
+  .legend i {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .legend .num {
+    font-weight: 700;
+  }
+
+  .wbars {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 0.85rem;
+  }
+
+  .wbars li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 0.35rem;
+    font-size: 12px;
+  }
+
+  .wb-name {
+    font-weight: 600;
+  }
+
+  .wb-v {
+    font-weight: 700;
+  }
+
+  .wb-track {
+    grid-column: 1 / -1;
+    height: 9px;
+    border-radius: 6px;
+    background: #f1f4f9;
+    overflow: hidden;
+  }
+
+  .wb-fill {
+    display: block;
+    height: 100%;
+    background: #1a2340;
+    border-radius: 6px;
+    transform-origin: left;
+    transform: scaleX(var(--w));
+  }
+
+  :global(.js) .wb-fill {
+    transform: scaleX(0);
+    transition: transform 900ms var(--ease-out);
+    transition-delay: calc(200ms + var(--d));
+  }
+
+  :global(.js) [data-stk][data-visible] .wb-fill {
+    transform: scaleX(var(--w));
+  }
+
+  .pipe-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  /* A real control: two radios, no script. */
+  .seg {
+    display: inline-flex;
+    padding: 3px;
+    margin: 0;
+    border: 1px solid var(--app-line);
+    border-radius: 10px;
+    background: #f5f7fb;
+  }
+
+  .seg input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .seg label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 32px;
+    padding: 0 0.75rem;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--app-muted);
+    cursor: pointer;
+    transition:
+      background-color 180ms ease,
+      color 180ms ease;
+    white-space: nowrap;
+  }
+
+  .seg label:has(input:checked) {
+    background: #fff;
+    color: var(--app-text);
+    box-shadow: 0 1px 2px rgb(15 21 32 / 0.12);
+  }
+
+  .seg label:has(input:focus-visible) {
+    outline: 2px solid var(--app-primary);
+    outline-offset: 1px;
+  }
+
+  .cnt {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.2rem;
+    height: 1.1rem;
+    border-radius: 9px;
+    background: #ffedd5;
+    color: #c2410c;
+    font-size: 10.5px;
+  }
+
+  .view-transit {
+    display: none;
+  }
+
+  .pipeline:has(#pipe-transit:checked) .view-transit {
+    display: block;
+  }
+
+  .pipeline:has(#pipe-transit:checked) .view-grn {
+    display: none;
+  }
+
+  .tbl-wrap {
+    overflow: hidden;
+  }
+
+  .tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+
+  .tbl th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-head);
+    padding: 0.55rem 0.7rem;
+    background: #f8f9fc;
+    white-space: nowrap;
+  }
+
+  .tbl td {
+    padding: 0.65rem 0.7rem;
+    border-top: 1px solid var(--app-line);
+    white-space: nowrap;
+  }
+
+  .tbl .serial {
+    font-size: 11.5px;
+  }
+
+  .tbl .b {
+    font-weight: 600;
+  }
+
+  .tbl .r {
+    text-align: right;
+  }
+
+  .stk .illustrative {
+    text-align: right;
+  }
+
+  @container (max-width: 40rem) {
+    .panels {
+      grid-template-columns: 1fr;
+    }
+    .tbl th:nth-child(2),
+    .tbl td:nth-child(2) {
+      display: none;
+    }
+  }
+
+  @container (max-width: 26rem) {
+    .tbl th:last-child,
+    .tbl td:last-child {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .copy,
+    .visual {
+      grid-column: 1;
+      grid-row: auto;
+    }
+    .visual {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  import { onceVisible } from '../scripts/scroll';
+  const stk = document.querySelector('[data-stk]');
+  onceVisible(stk, () => stk!.setAttribute('data-visible', ''), '0px 0px -25% 0px');
+</script>

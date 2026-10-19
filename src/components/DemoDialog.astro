@@ -1,0 +1,815 @@
+---
+import { DEMO_SERVICES } from '../server/demo-request';
+import { site } from '../data/site';
+---
+
+<dialog class="demo-dialog" id="demo-dialog" aria-labelledby="demo-title">
+  <div class="demo-shell">
+    <aside class="demo-intro">
+      <div class="demo-intro-head">
+        <img src="/brand/flowx365-logo.webp" width="320" height="125" alt="FlowX365 ERP" />
+        <button class="demo-close" type="button" data-demo-close aria-label="Close request a demo form">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="demo-intro-copy">
+        <p class="demo-kicker">Request a demo</p>
+        <h2 class="demo-title" id="demo-title">Let's talk</h2>
+        <p class="demo-lede">Tell us a little about your requirements, and our team will get back to you shortly.</p>
+      </div>
+      <div class="demo-contact">
+        <p class="demo-note">Submit your details to discuss a FlowX365 demo or your business needs.</p>
+        <p class="demo-email-label">Prefer email?</p>
+        <a class="demo-email" href={`mailto:${site.salesEmail}`}>{site.salesEmail}</a>
+      </div>
+    </aside>
+
+    <section class="demo-form-panel">
+      <div data-demo-form-view>
+        <div class="demo-form-head">
+          <p class="demo-form-title">Tell us about your business</p>
+          <p class="required-note">Fields marked <span aria-hidden="true">*</span><span class="visually-hidden">required</span> are required.</p>
+        </div>
+
+        <form class="demo-form" id="demo-form" novalidate>
+          <div class="demo-fields">
+            <div class="field">
+              <label for="demo-full-name">Full name <span aria-hidden="true">*</span></label>
+              <input id="demo-full-name" name="fullName" type="text" autocomplete="name" maxlength="100" required />
+              <p class="field-error" id="demo-full-name-error" data-error-for="fullName"></p>
+            </div>
+
+          <div class="field">
+            <label for="demo-email">Email address <span aria-hidden="true">*</span></label>
+            <input id="demo-email" name="email" type="email" autocomplete="email" maxlength="254" required />
+            <p class="field-error" id="demo-email-error" data-error-for="email"></p>
+          </div>
+
+          <div class="field">
+            <label for="demo-phone">Phone number <span aria-hidden="true">*</span></label>
+            <input id="demo-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="32" required />
+            <p class="field-error" id="demo-phone-error" data-error-for="phone"></p>
+          </div>
+
+          <div class="field">
+            <label for="demo-company">Company name <span class="optional">Optional</span></label>
+            <input id="demo-company" name="company" type="text" autocomplete="organization" maxlength="120" />
+            <p class="field-error" id="demo-company-error" data-error-for="company"></p>
+          </div>
+
+          <div class="field field-wide">
+            <label for="demo-service">Service required <span aria-hidden="true">*</span></label>
+            <div class="select-wrap">
+              <select id="demo-service" name="service" required>
+                <option value="">Select a service</option>
+                {DEMO_SERVICES.map((service) => <option value={service}>{service}</option>)}
+              </select>
+            </div>
+            <p class="field-error" id="demo-service-error" data-error-for="service"></p>
+          </div>
+
+          <div class="field field-wide">
+            <label for="demo-requirement">Briefly tell us about your requirement <span class="optional">Optional</span></label>
+            <textarea
+              id="demo-requirement"
+              name="requirement"
+              rows="5"
+              maxlength="2000"
+              placeholder="Share a brief overview of your project, requirement, or business need."
+            ></textarea>
+            <p class="field-error" id="demo-requirement-error" data-error-for="requirement"></p>
+          </div>
+
+          <div class="honeypot" aria-hidden="true">
+            <label for="demo-website">Website</label>
+            <input id="demo-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+          </div>
+
+          <div class="form-action field-wide">
+            <p class="form-message" id="demo-form-message" role="status" aria-live="polite"></p>
+            <button class="btn submit-btn" type="submit">
+              <span data-submit-label>Submit request</span>
+              <span class="submit-loader" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="demo-success" data-demo-success hidden>
+        <span class="success-mark" aria-hidden="true">✓</span>
+        <p class="demo-kicker">Request received</p>
+        <h2>Thank you for getting in touch.</h2>
+        <p>Your request has been sent to the FlowX365 team. We will contact you using the details you provided.</p>
+        <button class="btn" type="button" data-demo-close>Close</button>
+      </div>
+    </section>
+  </div>
+</dialog>
+
+<style>
+  .demo-dialog {
+    width: min(74rem, calc(100vw - 2rem));
+    max-width: none;
+    max-height: min(50rem, calc(100dvh - 2rem));
+    margin: auto;
+    padding: 0;
+    border: 1px solid rgb(247 248 250 / 0.24);
+    border-radius: 16px;
+    background: var(--original);
+    color: var(--ink);
+    overflow: hidden;
+    box-shadow: 0 2rem 6rem rgb(4 8 16 / 0.42);
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    transition:
+      opacity 220ms var(--ease-out),
+      transform 300ms var(--ease-sheet),
+      overlay 300ms allow-discrete,
+      display 300ms allow-discrete;
+  }
+
+  .demo-dialog[open] {
+    opacity: 1;
+    transform: none;
+  }
+
+  @starting-style {
+    .demo-dialog[open] {
+      opacity: 0;
+      transform: translateY(14px) scale(0.985);
+    }
+  }
+
+  .demo-dialog::backdrop {
+    background: rgb(5 9 18 / 0.76);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    transition:
+      opacity 220ms var(--ease-out),
+      overlay 300ms allow-discrete,
+      display 300ms allow-discrete;
+  }
+
+  .demo-dialog[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .demo-dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  .demo-shell {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(20rem, 0.82fr) minmax(0, 1.35fr);
+    height: min(50rem, calc(100dvh - 2rem));
+    min-height: min(45rem, calc(100dvh - 2rem));
+    max-height: min(50rem, calc(100dvh - 2rem));
+    overflow: hidden;
+  }
+
+  .demo-close {
+    position: relative;
+    flex: 0 0 auto;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    background: rgb(247 248 250 / 0.08);
+    border-color: rgb(247 248 250 / 0.3);
+    color: var(--on-cover);
+    cursor: pointer;
+    transition:
+      background-color 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+
+  .demo-close span {
+    position: absolute;
+    width: 1rem;
+    height: 1.5px;
+    background: currentColor;
+  }
+
+  .demo-close span:first-child { transform: rotate(45deg); }
+  .demo-close span:last-child { transform: rotate(-45deg); }
+
+  .demo-close:active { transform: scale(0.94); }
+
+  .demo-intro {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 2rem;
+    padding: clamp(2rem, 4vw, 4rem);
+    background: var(--cover);
+    color: var(--on-cover);
+  }
+
+  .demo-intro-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .demo-intro-copy {
+    align-self: center;
+    width: 100%;
+    max-width: 25rem;
+    padding-block: 1rem;
+  }
+
+  .demo-intro img {
+    width: min(12rem, 60%);
+    height: auto;
+    padding: 0.45rem 0.65rem;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .demo-kicker {
+    margin-bottom: 0.85rem;
+    color: var(--live);
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .demo-title {
+    max-width: 5.4ch;
+    font-size: clamp(3.75rem, 5.8vw, 6rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 118;
+    letter-spacing: -0.045em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    text-wrap: stable;
+  }
+
+  .demo-lede {
+    max-width: 23rem;
+    margin-top: 1.75rem;
+    color: var(--on-cover-2);
+    font-size: clamp(1rem, 1.25vw, 1.125rem);
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .demo-contact {
+    width: 100%;
+    max-width: 26rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgb(247 248 250 / 0.2);
+  }
+
+  .demo-note {
+    margin-top: 0;
+    color: var(--on-cover-3);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .demo-email-label {
+    margin-top: 1.25rem;
+    color: var(--on-cover-3);
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .demo-email {
+    display: inline-block;
+    margin-top: 0.35rem;
+    color: var(--on-cover);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.45;
+    text-decoration: underline;
+    text-decoration-color: rgb(247 248 250 / 0.55);
+    text-underline-offset: 0.24em;
+  }
+
+  .demo-email:focus-visible {
+    outline: 2px solid var(--live);
+    outline-offset: 4px;
+  }
+
+  .demo-form-panel {
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    padding: clamp(3.5rem, 5vw, 5rem) clamp(1.5rem, 4vw, 4rem) 2.5rem;
+    background: var(--original);
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+
+  [data-demo-form-view] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+  }
+
+  .demo-form-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .demo-form-title {
+    font-size: var(--step-1);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .required-note {
+    color: var(--ink-3);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .required-note > span:first-child,
+  .field label > span:not(.optional) {
+    color: var(--live-deep);
+  }
+
+  .demo-form {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    min-height: 0;
+  }
+
+  .demo-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 1.15rem 1rem;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 0.5rem;
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+
+  .field {
+    min-width: 0;
+  }
+
+  .field-wide {
+    grid-column: 1 / -1;
+  }
+
+  .field label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.45rem;
+    color: var(--ink-2);
+    font-size: 0.875rem;
+    font-weight: 650;
+  }
+
+  .optional {
+    color: var(--ink-3);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-ui);
+    background: #eef1f6;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.9375rem;
+    transition:
+      border-color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out);
+  }
+
+  input,
+  select {
+    min-height: 3.2rem;
+    padding: 0 0.9rem;
+  }
+
+  textarea {
+    min-height: 7.5rem;
+    padding: 0.8rem 0.9rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  textarea::placeholder { color: #737c8d; }
+
+  input:hover,
+  select:hover,
+  textarea:hover { border-color: var(--rule-strong); }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--live-deep);
+    background: #fff;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgb(245 130 10 / 0.16);
+  }
+
+  input[aria-invalid='true'],
+  select[aria-invalid='true'],
+  textarea[aria-invalid='true'] {
+    border-color: #b42318;
+  }
+
+  .select-wrap { position: relative; }
+
+  .select-wrap::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1.5px solid var(--ink-2);
+    border-bottom: 1.5px solid var(--ink-2);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  select {
+    appearance: none;
+    padding-right: 2.75rem;
+  }
+
+  .field-error {
+    min-height: 1.15rem;
+    padding-top: 0.25rem;
+    color: #a32218;
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .form-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.75rem;
+    margin-top: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    background: var(--original);
+  }
+
+  .form-message {
+    max-width: 28rem;
+    color: #a32218;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .submit-btn { min-width: 11rem; }
+
+  .submit-btn[disabled] {
+    cursor: wait;
+    opacity: 0.75;
+  }
+
+  .submit-loader {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgb(17 24 39 / 0.28);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: demo-spin 700ms linear infinite;
+  }
+
+  .submit-btn[disabled] .submit-loader { display: block; }
+
+  @keyframes demo-spin { to { transform: rotate(360deg); } }
+
+  .demo-success {
+    max-width: 34rem;
+    padding-top: clamp(2rem, 10vh, 7rem);
+  }
+
+  .demo-success[hidden] { display: none; }
+
+  .success-mark {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-bottom: 2rem;
+    border-radius: 50%;
+    background: var(--live);
+    color: var(--ink);
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .demo-success h2 {
+    font-size: var(--display-m);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .demo-success > p:not(.demo-kicker) {
+    max-width: 31rem;
+    margin: 1.5rem 0 2rem;
+    color: var(--ink-2);
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .demo-close:hover { background: rgb(247 248 250 / 0.16); }
+    .demo-email:hover { text-decoration-color: var(--live); }
+  }
+
+  @media (max-width: 900px) {
+    .demo-shell { grid-template-columns: minmax(16rem, 0.72fr) minmax(0, 1.35fr); }
+    .demo-intro { padding: 2.25rem; }
+    .demo-title { font-size: clamp(3.5rem, 6.5vw, 5rem); }
+    .demo-form-panel { padding-inline: 1.75rem; }
+    .demo-fields { grid-template-columns: 1fr; }
+    .field-wide { grid-column: auto; }
+    .form-action { align-items: stretch; flex-direction: column; }
+    .submit-btn { width: 100%; }
+  }
+
+  @media (min-width: 769px) and (max-height: 800px) {
+    .demo-intro {
+      gap: 2rem;
+      padding: 2.25rem;
+    }
+    .demo-intro img { width: 10rem; }
+    .demo-title { font-size: clamp(3.5rem, 5.5vw, 4.75rem); }
+    .demo-lede { margin-top: 1.25rem; font-size: 1.0625rem; }
+    .demo-note { margin-top: 0.65rem; }
+    .demo-form-panel { padding-top: 3.5rem; }
+  }
+
+  @media (max-width: 768px) {
+    .demo-dialog {
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .demo-shell {
+      display: block;
+      height: 100dvh;
+      min-height: 100dvh;
+      max-height: 100dvh;
+      overflow-y: auto;
+    }
+
+    .demo-close {
+      position: fixed;
+      top: max(1rem, env(safe-area-inset-top));
+      right: 1rem;
+      background: rgb(17 24 39 / 0.68);
+      border-color: rgb(247 248 250 / 0.28);
+      color: var(--on-cover);
+    }
+
+    .demo-intro {
+      min-height: auto;
+      padding: max(1.5rem, env(safe-area-inset-top)) 1.25rem 2rem;
+      gap: 2.5rem;
+    }
+
+    .demo-intro-copy { padding-block: 0; }
+
+    .demo-intro img { width: 9.5rem; }
+    .demo-title { max-width: 5.4ch; font-size: clamp(3.5rem, 16vw, 4.75rem); }
+    .demo-lede { margin-top: 1.25rem; font-size: 1.0625rem; }
+    .demo-form-panel { overflow: visible; padding: 2rem 1.25rem max(2rem, env(safe-area-inset-bottom)); }
+    [data-demo-form-view],
+    .demo-form { display: block; height: auto; }
+    .demo-fields { overflow: visible; padding-right: 0; }
+    .demo-form-head { display: block; }
+    .required-note { margin-top: 0.5rem; white-space: normal; }
+    .form-action { margin-top: 0.75rem; padding-top: 1rem; }
+    .demo-success { padding-top: 1.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .demo-dialog,
+    .demo-dialog::backdrop,
+    .demo-close,
+    input,
+    select,
+    textarea { transition-duration: 0.01ms; }
+    .submit-loader { animation-duration: 1.4s; }
+  }
+</style>
+
+<script>
+  import { DEMO_SERVICES } from '../server/demo-request';
+
+  const dialog = document.querySelector<HTMLDialogElement>('#demo-dialog');
+  const form = document.querySelector<HTMLFormElement>('#demo-form');
+  const formView = dialog?.querySelector<HTMLElement>('[data-demo-form-view]');
+  const successView = dialog?.querySelector<HTMLElement>('[data-demo-success]');
+  const formMessage = dialog?.querySelector<HTMLElement>('#demo-form-message');
+  const submitButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  const submitLabel = submitButton?.querySelector<HTMLElement>('[data-submit-label]');
+  let trigger: HTMLElement | null = null;
+
+  const fields = ['fullName', 'email', 'phone', 'company', 'service', 'requirement'] as const;
+  type FieldName = (typeof fields)[number];
+
+  function controlFor(name: FieldName): HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null {
+    return form?.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+  }
+
+  function setError(name: FieldName, message = '') {
+    const control = controlFor(name);
+    const error = dialog?.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+    if (!control || !error) return;
+    error.textContent = message;
+    if (message) {
+      control.setAttribute('aria-invalid', 'true');
+      control.setAttribute('aria-describedby', error.id);
+    } else {
+      control.removeAttribute('aria-invalid');
+      control.removeAttribute('aria-describedby');
+    }
+  }
+
+  function clearErrors() {
+    fields.forEach((name) => setError(name));
+    if (formMessage) formMessage.textContent = '';
+  }
+
+  function validate(): boolean {
+    clearErrors();
+    const fullName = controlFor('fullName')?.value.trim() ?? '';
+    const email = controlFor('email')?.value.trim() ?? '';
+    const phone = controlFor('phone')?.value.trim() ?? '';
+    const service = controlFor('service')?.value ?? '';
+    let firstInvalid: FieldName | null = null;
+
+    const invalidate = (name: FieldName, message: string) => {
+      setError(name, message);
+      firstInvalid ??= name;
+    };
+
+    if (!fullName) invalidate('fullName', 'Enter your full name.');
+    if (!email) invalidate('email', 'Enter your email address.');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) invalidate('email', 'Enter a valid email address.');
+
+    const digits = phone.replace(/\D/g, '');
+    if (!phone) invalidate('phone', 'Enter your phone number.');
+    else if (!/^[+\d\s().-]+$/.test(phone) || digits.length < 7 || digits.length > 15) {
+      invalidate('phone', 'Enter a valid phone number, including the country code if needed.');
+    }
+
+    if (!service) invalidate('service', 'Select a service.');
+    else if (!DEMO_SERVICES.includes(service as (typeof DEMO_SERVICES)[number])) {
+      invalidate('service', 'Select a service from the list.');
+    }
+
+    if (firstInvalid) {
+      controlFor(firstInvalid)?.focus();
+      return false;
+    }
+    return true;
+  }
+
+  function setSubmitting(submitting: boolean) {
+    if (!submitButton || !submitLabel) return;
+    submitButton.disabled = submitting;
+    submitButton.setAttribute('aria-busy', String(submitting));
+    submitLabel.textContent = submitting ? 'Sending request' : 'Submit request';
+  }
+
+  function resetDialog() {
+    clearErrors();
+    form?.reset();
+    setSubmitting(false);
+    if (formView) formView.hidden = false;
+    if (successView) successView.hidden = true;
+  }
+
+  function openDialog(event: Event) {
+    if (!dialog || dialog.open) return;
+    trigger = event.currentTarget as HTMLElement;
+    resetDialog();
+    document.documentElement.classList.add('dialog-open');
+    dialog.showModal();
+    requestAnimationFrame(() => controlFor('fullName')?.focus());
+  }
+
+  function closeDialog() {
+    dialog?.close();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-demo-trigger]').forEach((button) => {
+    button.addEventListener('click', openDialog);
+  });
+
+  dialog?.querySelectorAll<HTMLElement>('[data-demo-close]').forEach((button) => {
+    button.addEventListener('click', closeDialog);
+  });
+
+  dialog?.addEventListener('click', (event) => {
+    const rect = dialog.getBoundingClientRect();
+    const outside =
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom;
+    if (outside) closeDialog();
+  });
+
+  dialog?.addEventListener('close', () => {
+    document.documentElement.classList.remove('dialog-open');
+    trigger?.focus();
+    trigger = null;
+  });
+
+  fields.forEach((name) => controlFor(name)?.addEventListener('input', () => setError(name)));
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!form || !validate() || submitButton?.disabled) return;
+    setSubmitting(true);
+
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch('/api/demo-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { ok?: boolean; message?: string; fieldErrors?: Partial<Record<FieldName, string>> }
+        | null;
+
+      if (!response.ok || !result?.ok) {
+        if (result?.fieldErrors) {
+          for (const [name, message] of Object.entries(result.fieldErrors)) {
+            if (fields.includes(name as FieldName) && message) setError(name as FieldName, message);
+          }
+        }
+        if (formMessage) {
+          formMessage.textContent = result?.message ?? 'We could not send your request. Please try again.';
+        }
+        const firstError = fields.find((name) => controlFor(name)?.getAttribute('aria-invalid') === 'true');
+        if (firstError) controlFor(firstError)?.focus();
+        return;
+      }
+
+      if (formView) formView.hidden = true;
+      if (successView) successView.hidden = false;
+      successView?.querySelector<HTMLButtonElement>('[data-demo-close]')?.focus();
+    } catch {
+      if (formMessage) formMessage.textContent = 'Connection failed. Check your internet connection and try again.';
+    } finally {
+      setSubmitting(false);
+    }
+  });
+</script>
+
+<style is:global>
+  html.dialog-open,
+  html.dialog-open body {
+    overflow: hidden;
+  }
+</style>

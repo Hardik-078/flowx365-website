@@ -1,0 +1,235 @@
+---
+// A slice of the FlowX365 app shell: sidebar, top bar with breadcrumb and the
+// company switcher, and a content slot. Built from the app's own tokens.
+import Icon from './Icon.astro';
+import { company } from '../../data/sample';
+
+interface Props {
+  group: string;
+  items: string[];
+  active: string;
+  crumb: string[];
+  class?: string;
+  label: string;
+  sidebar?: boolean;
+}
+
+const { group, items, active, crumb, class: className, label, sidebar = true } = Astro.props;
+const others = ['SALES', 'PURCHASE', 'INVENTORY', 'ACCOUNTING', 'PLANNER'].filter((g) => g !== group);
+---
+
+<figure class:list={['app-shell', className]} aria-label={label}>
+  <div class:list={['app', 'frame', { 'no-side': !sidebar }]}>
+  {sidebar && (
+  <aside class="side" aria-hidden="true">
+    <div class="side-brand">
+      <img src="/brand/flowx365-mark-96.webp" width="22" height="22" alt="" loading="lazy" decoding="async" />
+      <span>FlowX365</span>
+    </div>
+    <p class="side-group">{group}</p>
+    <ul>
+      {
+        items.map((it) => (
+          <li class:list={[{ on: it === active }]}>
+            <span class="side-dot" />
+            {it}
+          </li>
+        ))
+      }
+    </ul>
+    {others.slice(0, 3).map((g) => <p class="side-group dim">{g}</p>)}
+  </aside>
+  )}
+
+  <div class="main">
+    <div class="top" aria-hidden="true">
+      <p class="crumb">
+        {
+          crumb.map((c, i) => (
+            <>
+              {i > 0 && <span class="sep">›</span>}
+              <span class:list={[{ here: i === crumb.length - 1 }]}>{c}</span>
+            </>
+          ))
+        }
+      </p>
+      <div class="top-end">
+        <span class="switcher"><Icon name="building" size={14} />{company.short}<Icon name="chevron" size={14} /></span>
+        <span class="avatar">SM</span>
+      </div>
+    </div>
+    <div class="content">
+      <slot />
+    </div>
+  </div>
+  </div>
+</figure>
+
+<style>
+  .app-shell {
+    margin: 0;
+    container-type: inline-size;
+    min-width: 0;
+  }
+
+  .frame {
+    display: grid;
+    grid-template-columns: 13.5rem minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .frame.no-side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .side {
+    background: linear-gradient(180deg, #1a2340, #141b30 55%, #0f1520);
+    color: #e2e8f0;
+    padding: 1rem 0.75rem;
+    font-size: 12.5px;
+  }
+
+  .side-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem 1.1rem;
+    font-weight: 800;
+    font-size: 14px;
+    font-variation-settings: 'wdth' 112;
+    color: #fff;
+  }
+
+  .side-brand img {
+    border-radius: 50%;
+  }
+
+  .side-group {
+    padding: 0.9rem 0.6rem 0.4rem;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgb(255 255 255 / 0.45);
+  }
+
+  .side-group.dim {
+    color: rgb(255 255 255 / 0.28);
+  }
+
+  .side li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .side-dot {
+    width: 6px;
+    height: 6px;
+    flex: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.5);
+  }
+
+  .side li.on {
+    background: rgb(245 130 10 / 0.12);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .side li.on .side-dot {
+    background: var(--app-primary);
+  }
+
+  .main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 3.25rem;
+    padding: 0 1.25rem;
+    background: #fff;
+    border-bottom: 1px solid var(--app-line);
+    flex: none;
+  }
+
+  .crumb {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+    color: var(--app-muted);
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .crumb .here {
+    color: var(--app-text);
+    font-weight: 650;
+  }
+
+  .sep {
+    color: #cbd5e1;
+  }
+
+  .top-end {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--app-line);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #1a2340;
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+
+  .content {
+    padding: 1.1rem 1.25rem 1.4rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  @container (max-width: 44rem) {
+    .frame {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .side {
+      display: none;
+    }
+    .switcher {
+      display: none;
+    }
+    .content {
+      padding: 0.9rem;
+    }
+  }
+</style>

@@ -1,0 +1,165 @@
+---
+import Icon from './ui/Icon.astro';
+import { site } from '../data/site';
+---
+
+<section class="close" id="demo" data-nav="dark" aria-labelledby="close-title">
+  <span class="perf" aria-hidden="true" style="--hole: var(--triplicate)"></span>
+  <div class="close-inner">
+    <h2 class="display-xl title" id="close-title" data-reveal="mask">
+      <span class="line">Write your</span>
+      <span class="line">next order</span>
+      <span class="line">once.</span>
+    </h2>
+
+    <div class="act">
+      <p class="lede" data-reveal style="--i: 2">
+        Tell us what you sell and how your team works today. We’ll walk you through FlowX365 with an
+        order like yours, from the first enquiry to the invoice.
+      </p>
+      <div class="buttons" data-reveal style="--i: 3">
+        <button class="btn btn-lg" type="button" data-demo-trigger>Request a demo <Icon name="arrow-right" /></button>
+        <p class="mail">
+          or write to <a href={`mailto:${site.salesEmail}`}>{site.salesEmail}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div class="foot-brand">
+      <img src="/brand/flowx365-logo.webp" width="320" height="125" alt="FlowX365 ERP" loading="lazy" decoding="async" />
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="#chain">How it works</a>
+      <a href="#details">Details</a>
+    </nav>
+    <p class="foot-meta serial">© {new Date().getFullYear()} {site.maker} · Product screens show illustrative data</p>
+  </footer>
+</section>
+
+<style>
+  .close {
+    position: relative;
+    z-index: 1;
+    background: var(--cover);
+    color: var(--on-cover);
+    padding: var(--section) var(--gutter) 2rem;
+  }
+
+  .close-inner {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .title {
+    font-size: min(var(--display-xl), 10.2vw);
+  }
+
+  @media (max-width: 760px) {
+    .title {
+      font-size: 17vw;
+    }
+  }
+
+  .title .line {
+    display: block;
+  }
+
+  .title .line:last-child {
+    color: var(--triplicate);
+  }
+
+  .act {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2rem clamp(2rem, 6vw, 6rem);
+    align-items: end;
+    max-width: 78rem;
+  }
+
+  .act .lede {
+    color: var(--on-cover-2);
+  }
+
+  .buttons {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .mail {
+    color: var(--on-cover-3);
+    font-size: 0.9375rem;
+  }
+
+  .mail a {
+    color: var(--on-cover);
+  }
+
+  .foot {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem 3rem;
+    align-items: center;
+    margin-top: var(--section);
+    padding-top: 2rem;
+    border-top: 1px dashed var(--cover-rule);
+  }
+
+  .foot-brand {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    width: max-content;
+  }
+
+  .foot-brand img {
+    width: 150px;
+    height: auto;
+  }
+
+  .foot-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem 2rem;
+  }
+
+  .foot-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    color: var(--on-cover-2);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .foot-links a:hover {
+      color: var(--on-cover);
+    }
+  }
+
+  .foot-meta {
+    grid-column: 1 / -1;
+    color: var(--on-cover-3);
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 760px) {
+    .act {
+      grid-template-columns: 1fr;
+    }
+    .buttons {
+      justify-items: stretch;
+    }
+    .foot {
+      grid-template-columns: 1fr;
+    }
+    .foot-links {
+      justify-content: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,170 @@
+---
+const qs = [
+  {
+    q: 'Can anyone change an invoice after it’s issued?',
+    a: 'No. An invoice’s lines must match the sales order it was raised from, and once it is issued the whole document is frozen. The database itself enforces this, so no screen, import or shortcut can make the two disagree.',
+    where: 'Sales invoices · Proforma invoices · Purchase invoices',
+    copy: 'original',
+  },
+  {
+    q: 'Where did this order come from?',
+    a: 'Every document shows where it came from and what it produced. Open a purchase order and you see the sales order or requisition behind it, each goods receipt against it, and how much has arrived.',
+    where: 'Document relationships on every detail screen',
+    copy: 'duplicate',
+  },
+  {
+    q: 'Who changed the price?',
+    a: 'Quotations, leads and customers keep a revision history: what changed, who changed it, and when. Moving a customer to another salesperson is recorded the same way.',
+    where: 'Revision history',
+    copy: 'triplicate',
+  },
+  {
+    q: 'Can my sales team see each other’s numbers?',
+    a: 'Only if you allow it. Roles switch each screen and action on or off for each person. On the trackers and the pipeline, a salesperson sees their own work, while an admin switches between their own and the whole team.',
+    where: 'Roles & permissions · My / Team views',
+    copy: 'original',
+  },
+  {
+    q: 'And when we open a second company?',
+    a: 'Add it. One login switches between companies, and each keeps its own document series, letterhead, signature and PDF design. The trackers can look at one company or all of them together.',
+    where: 'Companies · Company switcher',
+    copy: 'duplicate',
+  },
+];
+
+const holeFor = (i: number) => (i === 0 ? 'var(--cover)' : `var(--${qs[i - 1].copy})`);
+---
+
+<section class="questions" id="questions" data-chapter-group aria-labelledby="questions-title">
+  <h2 class="visually-hidden" id="questions-title">Questions an owner should ask</h2>
+  {
+    qs.map((item, i) => (
+      <article
+        class="sheet qsheet"
+        data-copy={item.copy}
+        data-nav="light"
+        data-chapter={`No. 08 · Question ${i + 1} of ${qs.length}`}
+        id={i === 0 ? 'questions-start' : undefined}
+        aria-labelledby={`q-${i}`}
+      >
+        <span class="perf" aria-hidden="true" style={`--hole: ${holeFor(i)}`} />
+        <div class="stub" aria-hidden="true">
+          <span class="serial">Q. {i + 1} of {qs.length}</span>
+        </div>
+        <div class="sheet-inner q-inner">
+          <h3 class="display-l q" id={`q-${i}`}>
+            {item.q}
+          </h3>
+          <div class="a">
+            <p class="lede">{item.a}</p>
+            <p class="where form-head">{item.where}</p>
+          </div>
+        </div>
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  .questions {
+    position: relative;
+  }
+
+  .qsheet {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    box-shadow: 0 -24px 48px -24px rgb(15 21 32 / 0.35);
+  }
+
+  .q-inner {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    grid-template-rows: 1fr auto;
+    gap: 2rem clamp(2rem, 5vw, 6rem);
+    padding-top: calc(var(--nav-h) + clamp(2rem, 6vh, 4.5rem));
+    padding-bottom: clamp(2.5rem, 8vh, 5rem);
+  }
+
+  .q {
+    grid-column: 1 / -1;
+    max-width: 15ch;
+    align-self: start;
+  }
+
+  .a {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+  }
+
+  .a .lede {
+    color: var(--ink);
+  }
+
+  .where {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--rule-strong);
+    color: var(--ink-2);
+    letter-spacing: 0.08em;
+    font-size: 0.6875rem;
+  }
+
+  /* The heading lands first; the answer follows once the sheet is in place. */
+  :global(.js) .qsheet .a {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 500ms var(--ease-out),
+      transform 700ms var(--ease-out);
+  }
+
+  :global(.js) .qsheet[data-visible] .a {
+    opacity: 1;
+    transform: none;
+    transition-delay: 150ms;
+  }
+
+  @media (max-width: 900px) {
+    .q-inner {
+      grid-template-columns: 1fr;
+    }
+    .a {
+      grid-column: 1;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .q {
+      font-size: clamp(2.5rem, 11vw, 3.5rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .qsheet .a {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const sheets = document.querySelectorAll('.qsheet');
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          e.target.setAttribute('data-visible', '');
+          io.unobserve(e.target);
+        }
+      }
+    },
+    { threshold: 0.55 },
+  );
+  sheets.forEach((s) => io.observe(s));
+</script>

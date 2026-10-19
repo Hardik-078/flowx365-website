@@ -1,0 +1,25 @@
+{
+  "name": "flowx365-site",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "og": "node tools/make-og.mjs && magick -density 96 tools/og.svg -strip -depth 8 -define png:compression-level=9 public/og.png"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "astro": "^7.3.4"
+  },
+  "devDependencies": {
+    "fontkit": "^2.0.4",
+    "wawoff2": "^2.0.1"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

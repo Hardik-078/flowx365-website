@@ -1,0 +1,510 @@
+---
+import AppFrame from './ui/AppFrame.astro';
+import { docs, customer, total, inr } from '../data/sample';
+
+const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
+const quotes = [8, 11, 9, 13, 12, 11];
+const orders = [3, 5, 4, 6, 6, 7];
+const totalQuotes = quotes.reduce((a, b) => a + b, 0);
+const converted = 29;
+const salesOrders = orders.reduce((a, b) => a + b, 0);
+const rate = Math.round((converted / totalQuotes) * 100);
+
+const people = [
+  { name: 'Priya S.', v: 38.2 },
+  { name: 'Arjun M.', v: 31.5 },
+  { name: 'Neha K.', v: 27.9 },
+  { name: 'Rakesh P.', v: 26.4 },
+];
+const peopleMax = 40;
+const salesValue = (people.reduce((a, p) => a + p.v, 0) / 100).toFixed(2);
+
+const kpis = [
+  { label: 'Total quotations', v: String(totalQuotes) },
+  { label: 'Active quotations', v: '21' },
+  { label: 'Converted', v: String(converted) },
+  { label: 'Sales orders', v: String(salesOrders) },
+  { label: 'Conversion rate', v: `${rate}%` },
+  { label: 'Sales value', v: `₹${salesValue}Cr` },
+];
+
+// Chart geometry
+const W = 600;
+const H = 230;
+const top = 12;
+const base = 196;
+const max = 14;
+const groupW = (W - 40) / months.length;
+const barW = 24;
+const y = (v: number) => base - (v / max) * (base - top);
+
+const rows = [
+  { q: docs.quotation, c: customer.name, v: `₹${inr(total)}`, s: 'Converted', tone: 'indigo', so: docs.salesOrder },
+  { q: 'AE/26-27/QT/091', c: 'Sethi Agro Foods', v: '₹8,12,400', s: 'Sent', tone: 'blue', so: '—' },
+  { q: 'AE/26-27/QT/093', c: 'Puri Beach Residency', v: '₹2,38,950', s: 'Draft', tone: 'slate', so: '—' },
+];
+---
+
+<section class="sheet tracker" id="tracker" data-copy="duplicate" data-nav="light" data-chapter="No. 04 · Quotes to orders" aria-labelledby="tracker-title">
+  <span class="perf" aria-hidden="true" style="--hole: var(--original)"></span>
+  <div class="stub" aria-hidden="true"><span class="serial">No. 04 · Duplicate</span></div>
+
+  <div class="sheet-inner">
+    <div class="head">
+      <h2 class="display-l" id="tracker-title" data-reveal="mask">See which quotes became orders.</h2>
+      <p class="lede" data-reveal style="--i: 2">
+        The Sales Tracker sets quotations beside the orders they turned into, month by month, for
+        the whole business or one salesperson. The gap between each pair of bars is your conversion
+        story.
+      </p>
+    </div>
+
+    <div class="visual" data-reveal>
+      <AppFrame
+        label="FlowX365 Sales Tracker screen, with illustrative data"
+        group="SALES"
+        items={['Customer Management', 'Estimation / Quotation', 'Sales Order Processing', 'Delivery Notes', 'Sales Tracker']}
+        active="Sales Tracker"
+        crumb={['Sales', 'Sales Tracker']}
+      >
+        <div class="trk" data-trk>
+          <div class="modes" aria-hidden="true">
+            <span class="mode on">General</span><span class="mode">Team</span>
+          </div>
+
+          <div class="cards">
+            <div class="card chart-card">
+              <p class="card-title">Quotations vs sales orders</p>
+              <svg viewBox={`0 0 ${W} ${H}`} class="chart" role="img" aria-label={`Quotations and sales orders by month, April to September: ${months.map((m, i) => `${m} ${quotes[i]} quotations, ${orders[i]} orders`).join('; ')}.`}>
+                {[0, 5, 10].map((g) => (
+                  <g>
+                    <line x1="34" x2={W} y1={y(g)} y2={y(g)} class="grid" />
+                    <text x="26" y={y(g) + 4} class="axis" text-anchor="end">{g}</text>
+                  </g>
+                ))}
+                {months.map((m, i) => {
+                  const x0 = 40 + i * groupW + (groupW - (barW * 2 + 6)) / 2;
+                  return (
+                    <g>
+                      <rect class="bar q" x={x0} y={y(quotes[i])} width={barW} height={base - y(quotes[i])} rx="4" style={`--d: ${i * 60}ms`} />
+                      <rect class="bar o" x={x0 + barW + 6} y={y(orders[i])} width={barW} height={base - y(orders[i])} rx="4" style={`--d: ${i * 60 + 30}ms`} />
+                      <text x={x0 + barW + 3} y={H - 8} class="axis" text-anchor="middle">{m}</text>
+                    </g>
+                  );
+                })}
+              </svg>
+              <p class="legend" aria-hidden="true">
+                <span><i class="sw q"></i>Quotations</span><span><i class="sw o"></i>Sales orders</span>
+              </p>
+            </div>
+
+            <div class="card">
+              <p class="card-title">Employee-wise sales</p>
+              <ul class="hbars">
+                {people.map((p, i) => (
+                  <li>
+                    <span class="hb-name">{p.name}</span>
+                    <span class="hb-track"><span class="hb-fill" style={`--w: ${p.v / peopleMax}; --d: ${i * 80}ms`} /></span>
+                    <span class="hb-v num">₹{p.v}L</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div class="kpis">
+            {kpis.map((k) => (
+              <div class="kpi">
+                <p class="kpi-label">{k.label}</p>
+                <p class="kpi-v num">{k.v}</p>
+              </div>
+            ))}
+          </div>
+
+          <table class="rows">
+            <thead>
+              <tr><th scope="col">Quote no.</th><th scope="col">Customer</th><th scope="col" class="r">Value</th><th scope="col">Status</th><th scope="col">Sales order</th></tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr class:list={[{ hl: i === 0 }]}>
+                  <td class="serial" data-label="Quote no.">{r.q}</td>
+                  <td class="c" data-label="Customer">{r.c}</td>
+                  <td class="r num" data-label="Value">{r.v}</td>
+                  <td data-label="Status"><span class="badge" data-tone={r.tone}>{r.s}</span></td>
+                  <td class="serial" data-label="Sales order">{r.so}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p class="illustrative">Illustrative data</p>
+        </div>
+      </AppFrame>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tracker {
+    padding: var(--section) 0;
+    overflow-x: clip;
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: 2rem clamp(2rem, 6vw, 7rem);
+    align-items: end;
+  }
+
+  .head .display-l {
+    max-width: 12ch;
+  }
+
+  .head .lede {
+    color: var(--ink-2);
+  }
+
+  .visual {
+    margin-top: clamp(3rem, 6vw, 5.5rem);
+    margin-left: calc(-1 * clamp(0rem, 8vw, 10rem));
+  }
+
+  .trk {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .modes {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .mode {
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: #fff;
+    border: 1px solid var(--app-line);
+    color: var(--app-text-2);
+  }
+
+  .mode.on {
+    background: #1a2340;
+    color: #fff;
+    border-color: #1a2340;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    padding: 0.9rem;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-text-2);
+    margin-bottom: 0.6rem;
+  }
+
+  .chart {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .grid {
+    stroke: #eef1f6;
+    stroke-width: 1;
+  }
+
+  .axis {
+    font-size: 11px;
+    fill: #94a3b8;
+    font-family: var(--font);
+  }
+
+  .bar {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+
+  .bar.q,
+  .sw.q {
+    fill: #f5820a;
+    background: #f5820a;
+  }
+
+  .bar.o,
+  .sw.o {
+    fill: #4338ca;
+    background: #4338ca;
+  }
+
+  :global(.js) .bar {
+    transform: scaleY(0);
+    transition: transform 800ms var(--ease-out);
+    transition-delay: var(--d);
+  }
+
+  :global(.js) [data-trk][data-visible] .bar {
+    transform: none;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1rem;
+    font-size: 11.5px;
+    color: var(--app-muted);
+    margin-top: 0.4rem;
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .sw {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .hbars {
+    display: grid;
+    gap: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  .hbars li {
+    display: grid;
+    grid-template-columns: 4.6rem 1fr auto;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .hb-name {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .hb-track {
+    height: 10px;
+    border-radius: 6px;
+    background: #f1f4f9;
+    overflow: hidden;
+  }
+
+  .hb-fill {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+    background: #4338ca;
+    transform-origin: left;
+    transform: scaleX(var(--w));
+  }
+
+  :global(.js) .hb-fill {
+    transform: scaleX(0);
+    transition: transform 900ms var(--ease-out);
+    transition-delay: calc(300ms + var(--d));
+  }
+
+  :global(.js) [data-trk][data-visible] .hb-fill {
+    transform: scaleX(var(--w));
+  }
+
+  .hb-v {
+    font-weight: 700;
+    min-width: 3.4rem;
+    text-align: right;
+  }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .kpi {
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .kpi-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-head);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .kpi-v {
+    font-size: 20px;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 108;
+  }
+
+  .rows {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 12.5px;
+  }
+
+  .rows th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-head);
+    padding: 0.65rem 0.9rem;
+    background: #f8f9fc;
+  }
+
+  .rows td {
+    padding: 0.7rem 0.9rem;
+    border-top: 1px solid var(--app-line);
+    white-space: nowrap;
+  }
+
+  .rows .serial {
+    font-size: 11.5px;
+  }
+
+  .rows .c {
+    font-weight: 600;
+  }
+
+  .rows .r {
+    text-align: right;
+  }
+
+  .rows tr.hl td {
+    background: #fff8f3;
+  }
+
+  .trk .illustrative {
+    text-align: right;
+  }
+
+  @container (max-width: 44rem) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+    .kpis {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .rows th:nth-child(2),
+    .rows td:nth-child(2),
+    .rows th:nth-child(5),
+    .rows td:nth-child(5) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .head {
+      grid-template-columns: 1fr;
+    }
+    .visual {
+      margin-left: 0;
+    }
+  }
+
+  /* Keep the real table semantics, but present each row as a labelled record
+     when the app frame is too narrow for columnar data. */
+  @media (max-width: 360px) {
+    .rows {
+      display: block;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      overflow: visible;
+    }
+
+    .rows thead {
+      display: none;
+    }
+
+    .rows tbody {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .rows tr {
+      display: grid;
+      gap: 0.45rem;
+      padding: 0.75rem;
+      border: 1px solid var(--app-line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .rows tr.hl {
+      background: #fff8f3;
+    }
+
+    .rows td,
+    .rows td:nth-child(2),
+    .rows td:nth-child(5) {
+      display: grid;
+      grid-template-columns: minmax(5rem, 0.8fr) minmax(0, 1.2fr);
+      gap: 0.5rem;
+      align-items: baseline;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      white-space: normal;
+      text-align: left;
+    }
+
+    .rows tr.hl td {
+      background: transparent;
+    }
+
+    .rows td::before {
+      content: attr(data-label);
+      color: var(--app-head);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .rows td > * {
+      justify-self: start;
+    }
+  }
+</style>
+
+<script>
+  import { onceVisible } from '../scripts/scroll';
+  const trk = document.querySelector('[data-trk]');
+  onceVisible(trk, () => trk!.setAttribute('data-visible', ''), '0px 0px -25% 0px');
+</script>

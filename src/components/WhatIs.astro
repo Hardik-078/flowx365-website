@@ -1,0 +1,510 @@
+---
+import Icon from './ui/Icon.astro';
+import { inr, total, lines, stock } from '../data/sample';
+
+const particulars = [
+  { name: 'CRM', covers: 'Leads, approvals, sales pipeline, targets and performance' },
+  { name: 'Sales', covers: 'Customers and branches, quotations, sales orders, delivery notes' },
+  { name: 'Purchase', covers: 'Vendors, requisitions, purchase orders, goods and service receipts, returns' },
+  { name: 'Inventory', covers: 'Items, live stock by warehouse, stock transfers' },
+  { name: 'Accounting', covers: 'Proforma, sales and purchase invoices, expenses, payments to vendors' },
+  { name: 'Planner', covers: 'Daily, weekly and monthly plans, meetings, follow-ups, team schedule' },
+  { name: 'People', covers: 'Biometric attendance, leave, HR desk' },
+  { name: 'Admin', covers: 'Companies, users, roles and permissions, document series, PDF designs' },
+];
+
+// The same order, as five disconnected tools remember it.
+const wrongTotal = total - 6700;
+const cable = lines[0];
+---
+
+<section
+  class="sheet what"
+  id="what"
+  data-nav="light"
+  data-chapter="No. 01 · What it is"
+  aria-labelledby="what-q"
+>
+  <span class="perf" aria-hidden="true"></span>
+  <div class="stub" aria-hidden="true"><span class="serial">No. 01 · Original</span></div>
+
+  <div class="sheet-inner">
+    <div class="intro">
+      <h2 class="q display-m" id="what-q" data-reveal>But what is FlowX365, actually?</h2>
+      <p class="answer display-l" data-reveal style="--i: 1">
+        One system that carries your business from the first enquiry to the final invoice.
+      </p>
+    </div>
+
+    <div class="what-body">
+      <p class="lede" data-reveal>
+        Leads, quotations, orders, dispatch and invoices. Purchase and stock. Your team's plans,
+        attendance and leave. Built for Indian businesses, with GST, rupees in lakh and crore, and
+        document numbers by financial year.
+      </p>
+
+      <table class="particulars" data-reveal style="--i: 1">
+        <caption class="visually-hidden">What FlowX365 includes</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="c-sr">Sr.</th>
+            <th scope="col">Particulars</th>
+            <th scope="col">Includes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            particulars.map((p, i) => (
+              <tr>
+                <td class="c-sr serial">{i + 1}</td>
+                <th scope="row" class="form-head">{p.name}</th>
+                <td>{p.covers}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="c-sr"></td>
+            <th scope="row" class="form-head">Total</th>
+            <td><strong>One system, one login, on the web and Android.</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="problem" id="problem">
+      <h2 class="display-l problem-head" data-reveal>Today, one order gets written five times.</h2>
+
+      <div class="scraps" data-scraps>
+        <figure class="scrap sheetcalc" style="--r: -3deg; --x: 0; --y: 0; --i: 0">
+          <figcaption class="scrap-name serial">Quote_v3_FINAL.xlsx</figcaption>
+          <div class="grid" role="presentation">
+            <span class="h">A</span><span class="h">B</span><span class="h">C</span>
+            <span>Cable 4 sq mm</span><span class="num">40</span><span class="num">6,850</span>
+            <span>MCB board 8-way</span><span class="num">40</span><span class="num">2,150</span>
+            <span>Total incl. GST</span><span></span><span class="num"><mark>{inr(total)}</mark></span>
+          </div>
+        </figure>
+
+        <figure class="scrap chat" style="--r: 2.5deg; --i: 1">
+          <figcaption class="visually-hidden">A chat message</figcaption>
+          <p>Sir pls confirm <mark>40 coils</mark> same rate as last time. PI kindly send today</p>
+          <span class="serial">11:42</span>
+        </figure>
+
+        <figure class="scrap challan" style="--r: -1.5deg; --i: 2">
+          <figcaption class="form-head">Delivery challan <span class="serial">No. 318</span></figcaption>
+          <div class="challan-row">
+            <span>Cu cable 4 sq mm</span>
+            <span class="carbon hand"><mark>38 coils</mark></span>
+          </div>
+          <div class="challan-row"><span>Received by</span><span class="carbon hand">R.M.</span></div>
+        </figure>
+
+        <figure class="scrap bill" style="--r: 3.5deg; --i: 3">
+          <figcaption class="serial">INV-2291 · Billing software</figcaption>
+          <p class="bill-total">
+            <span>Grand total</span>
+            <span class="num"><mark>₹{inr(wrongTotal)}</mark></span>
+          </p>
+        </figure>
+
+        <figure class="scrap register" style="--r: -2deg; --i: 4">
+          <figcaption class="form-head">Stock register</figcaption>
+          <p>
+            <span>{cable.item.split(',')[0]}</span>
+            <span class="carbon hand">Bal. <mark>{stock.before + 2}</mark></span>
+          </p>
+        </figure>
+      </div>
+
+      <div class="verdict">
+        <p class="display-m" data-reveal>Five copies. Five different numbers.</p>
+        <a class="link-quiet next" href="#chain" data-reveal style="--i: 1">
+          Now write the same order once <Icon name="arrow-right" />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .what {
+    --hole: var(--cover);
+    margin-top: calc(-1 * clamp(3.5rem, 2.8rem + 2vw, 5rem));
+    padding: clamp(4.5rem, 3rem + 6vw, 9rem) 0 var(--section);
+    z-index: 1;
+    box-shadow: 0 -30px 60px -20px rgb(0 0 0 / 0.45);
+  }
+
+  .intro {
+    max-width: 78rem;
+  }
+
+  .q {
+    color: var(--ink-3);
+    font-weight: 700;
+  }
+
+  .answer {
+    margin-top: 0.35em;
+  }
+
+  .what-body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+    gap: 3rem clamp(2rem, 6vw, 7rem);
+    margin-top: clamp(3rem, 7vw, 7rem);
+    align-items: start;
+  }
+
+  .what-body .lede {
+    color: var(--ink-2);
+    position: sticky;
+    top: calc(var(--nav-h) + 2rem);
+  }
+
+  /* A bill's particulars table: ruled, numbered, totalled. */
+  .particulars {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step-0);
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .particulars thead th {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    text-align: left;
+    padding: 0.85rem 1rem 0.85rem 0;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .particulars td,
+  .particulars tbody th,
+  .particulars tfoot th {
+    padding: 1.05rem 1rem 1.05rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  .particulars tbody th {
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    width: 1%;
+    padding-right: clamp(1rem, 3vw, 3rem);
+  }
+
+  .particulars td:last-child {
+    color: var(--ink-2);
+  }
+
+  .c-sr {
+    width: 2.5rem;
+    color: var(--ink-3);
+  }
+
+  .particulars tfoot th,
+  .particulars tfoot td {
+    border-top: 1px solid var(--ink);
+    border-bottom: 0;
+    padding-top: 1.1rem;
+  }
+
+  .particulars tfoot td:last-child {
+    color: var(--ink);
+  }
+
+  /* ── The problem ─────────────────────────────────────────────── */
+  .problem {
+    margin-top: var(--section);
+  }
+
+  .problem-head {
+    max-width: 14ch;
+  }
+
+  .scraps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(6, minmax(4.5rem, auto));
+    gap: 1rem;
+    margin: clamp(3rem, 6vw, 6rem) 0 clamp(3rem, 6vw, 5rem);
+  }
+
+  .scrap {
+    position: relative;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 1.1rem 1.25rem;
+    box-shadow:
+      0 1px 1px rgb(15 21 32 / 0.08),
+      0 12px 28px -12px rgb(15 21 32 / 0.28);
+    transform: rotate(var(--r));
+    font-size: 0.9375rem;
+  }
+
+  :global(.js) .scrap {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0) rotate(calc(var(--r) * 2.5));
+    transition:
+      opacity 600ms var(--ease-out),
+      transform 1100ms var(--ease-out);
+    transition-delay: calc(var(--i) * 110ms);
+  }
+
+  :global(.js) [data-scraps][data-visible] .scrap {
+    opacity: 1;
+    transform: rotate(var(--r));
+  }
+
+  .sheetcalc {
+    grid-column: 1 / span 5;
+    grid-row: 1 / span 3;
+    padding: 0;
+    overflow: hidden;
+  }
+  .chat {
+    grid-column: 7 / span 4;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  .challan {
+    grid-column: 5 / span 4;
+    grid-row: 3 / span 3;
+    background: var(--duplicate);
+    z-index: 1;
+  }
+  .bill {
+    grid-column: 10 / span 3;
+    grid-row: 3 / span 2;
+    align-self: end;
+  }
+  .register {
+    grid-column: 2 / span 3;
+    grid-row: 5 / span 2;
+    background: var(--triplicate);
+  }
+
+  .scrap-name {
+    padding: 0.6rem 0.9rem;
+    background: #e9f2ec;
+    color: #1f5132;
+    border-bottom: 1px solid #cfe0d5;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.6fr 0.6fr 0.9fr;
+    font-size: 0.875rem;
+  }
+
+  .grid span {
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+    white-space: nowrap;
+  }
+
+  .grid .h {
+    background: #f3f4f6;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.25rem;
+  }
+
+  .grid .num {
+    text-align: right;
+  }
+
+  .chat {
+    background: #ffffff;
+    border-radius: 14px 14px 14px 4px;
+    max-width: 22rem;
+  }
+
+  .chat p {
+    line-height: 1.45;
+  }
+
+  .chat .serial {
+    display: block;
+    margin-top: 0.4rem;
+    text-align: right;
+    color: var(--ink-3);
+    font-size: 0.75rem;
+  }
+
+  .challan figcaption,
+  .register figcaption {
+    font-size: 0.8125rem;
+    margin-bottom: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .challan-row,
+  .register p {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgb(17 24 39 / 0.25);
+  }
+
+  .hand {
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.0625rem;
+  }
+
+  .bill figcaption {
+    color: var(--ink-3);
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .bill-total {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .bill-total .num {
+    font-size: var(--step-2);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* A highlighter pen swipes over every number that disagrees. */
+  mark {
+    color: inherit;
+    background: linear-gradient(transparent 12%, rgb(245 214 50 / 0.85) 12% 88%, transparent 88%) 0 0 / 0% 100% no-repeat;
+    padding: 0 0.12em;
+    margin: 0 -0.12em;
+    transition: background-size 650ms var(--ease-out);
+    transition-delay: calc(900ms + var(--i, 0) * 110ms);
+  }
+
+  /* On a coloured slip the pen is the other copy's colour. */
+  .challan mark {
+    background-image: linear-gradient(transparent 12%, rgb(244 224 126 / 0.95) 12% 88%, transparent 88%);
+  }
+
+  .register mark {
+    background-image: linear-gradient(transparent 12%, rgb(232 150 172 / 0.75) 12% 88%, transparent 88%);
+  }
+
+  [data-scraps][data-visible] mark,
+  :global(html:not(.js)) mark {
+    background-size: 100% 100%;
+  }
+
+  .scrap mark {
+    --i: inherit;
+  }
+
+  .verdict {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+  }
+
+  .verdict .display-m {
+    max-width: 16ch;
+  }
+
+  .next {
+    color: var(--carbon);
+    font-size: var(--step-1);
+  }
+
+  @media (max-width: 960px) {
+    .what-body {
+      grid-template-columns: 1fr;
+    }
+    .what-body .lede {
+      position: static;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .what {
+      padding-top: 4.5rem;
+    }
+    .particulars thead {
+      display: none;
+    }
+    .particulars tr {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .particulars td,
+    .particulars tbody th,
+    .particulars tfoot th {
+      border: 0;
+      padding: 0;
+    }
+    .particulars td:last-child {
+      grid-column: 2;
+      margin-top: 0.25rem;
+      font-size: 0.9375rem;
+    }
+    .particulars tfoot tr {
+      border-bottom: 0;
+      border-top: 1px solid var(--ink);
+    }
+    .particulars tfoot th,
+    .particulars tfoot td {
+      border: 0;
+      padding-top: 0;
+    }
+    .scraps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .scrap {
+      margin-bottom: -0.6rem;
+      max-width: 88%;
+    }
+    .scrap:nth-child(even) {
+      align-self: flex-end;
+    }
+    .sheetcalc {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const scraps = document.querySelector('[data-scraps]');
+  if (scraps) {
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          scraps.setAttribute('data-visible', '');
+          io.disconnect();
+        }
+      },
+      { rootMargin: '0px 0px -25% 0px' },
+    );
+    io.observe(scraps);
+  }
+</script>

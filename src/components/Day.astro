@@ -1,0 +1,425 @@
+---
+import Icon from './ui/Icon.astro';
+import { docs } from '../data/sample';
+
+const toMin = (t: string) => {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+};
+
+const events = [
+  { t: '07:30', icon: 'mail', title: 'Morning agenda', body: 'Everyone gets an email of what they planned for today, including meetings they were invited to.' },
+  { t: '09:12', icon: 'fingerprint', title: 'Punch in', body: 'Punches arrive from the biometric terminal at the door, straight into attendance.' },
+  { t: '10:30', icon: 'bell', title: 'Meeting reminder', body: 'Thirty minutes before the client meeting, a reminder arrives with the venue.' },
+  { t: '11:00', icon: 'pin', title: 'Client meeting', body: 'Location is captured on arrival and on completion. If it is a field visit, an attendance request is filed for everyone attending.' },
+  { t: '16:20', icon: 'file', title: 'Quotation sent', body: `${docs.quotation} goes out as a PDF and is marked Sent on the Sales Tracker.` },
+  { t: '19:00', icon: 'clock', title: 'Overdue digest', body: 'Anything still open gets one email, and comes back each day until it is marked done.' },
+  { t: '21:00', icon: 'calendar', title: 'Attendance cutoff', body: 'Short days become half days, leave is charged, and notices go out. An approved field visit counts as a full day.' },
+] as const;
+
+const START = toMin('07:30');
+const END = toMin('21:30');
+const pos = (t: string) => (toMin(t) - START) / (END - START);
+const hours = [8, 10, 12, 14, 16, 18, 20];
+---
+
+<section class="day" id="day" data-nav="dark" data-chapter="No. 07 · A day" aria-labelledby="day-title">
+  <div class="day-intro">
+    <h2 class="display-l" id="day-title" data-reveal="mask">Your team’s day, already in order.</h2>
+    <p class="lede" data-reveal style="--i: 2">
+      Plans, reminders, meetings, punches and the evening’s loose ends all run off the same
+      calendar. Scroll through one working day.
+    </p>
+  </div>
+
+  <div class="track" data-day data-start={START} data-end={END}>
+    <div class="stage">
+      <div class="now">
+        <p class="clock num" aria-hidden="true"><span data-clock>07:30</span><span class="ist">IST</span></p>
+        <div class="details">
+          {
+            events.map((e, i) => (
+              <div class="detail" data-detail={i}>
+                <p class="d-title">
+                  <Icon name={e.icon} size={22} />
+                  {e.title}
+                </p>
+                <p class="d-body">{e.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <ol class="table" aria-label="A working day in FlowX365">
+        {
+          events.map((e, i) => (
+            <li data-event={i} data-at={toMin(e.t)}>
+              <span class="serial t">{e.t}</span>
+              <span class="e-title">{e.title}</span>
+              <span class="visually-hidden">: {e.body}</span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="rule" aria-hidden="true">
+        <div class="rail">
+          {hours.map((h) => (
+            <span class="tick" style={`left: ${(((h * 60 - START) / (END - START)) * 100).toFixed(2)}%`}>
+              <span class="serial">{String(h).padStart(2, '0')}:00</span>
+            </span>
+          ))}
+          {events.map((e) => (
+            <span class="pip" style={`left: ${(pos(e.t) * 100).toFixed(2)}%`} />
+          ))}
+          <span class="done" data-done></span>
+          <span class="head" data-head></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .day {
+    position: relative;
+    background: var(--cover);
+    color: var(--on-cover);
+    padding-top: var(--section);
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+  }
+
+  .day-intro {
+    padding: 0 var(--gutter);
+  }
+
+  .day-intro .display-l {
+    max-width: 13ch;
+  }
+
+  .day-intro .lede {
+    margin-top: 2rem;
+    color: var(--on-cover-2);
+  }
+
+  .track {
+    margin-top: clamp(2rem, 6vw, 5rem);
+  }
+
+  :global(.js) .track {
+    height: 540vh;
+    height: 540svh;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    column-gap: clamp(2rem, 5vw, 6rem);
+    padding: calc(var(--nav-h) + 1.5rem) var(--gutter) 2rem;
+  }
+
+  :global(.js) .stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .now {
+    align-self: center;
+    min-width: 0;
+  }
+
+  .clock {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: clamp(4.75rem, 1rem + 15vw, 15rem);
+    font-weight: 800;
+    line-height: 0.82;
+    letter-spacing: -0.04em;
+    font-variation-settings: 'wdth' 125;
+    color: var(--original);
+  }
+
+  .ist {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--on-cover-3);
+    margin-top: 0.4rem;
+  }
+
+  html:not(.js) .clock {
+    display: none;
+  }
+
+  .details {
+    position: relative;
+    display: grid;
+    margin-top: clamp(1.5rem, 4vh, 3rem);
+    min-height: 9rem;
+    max-width: 34rem;
+  }
+
+  :global(.js) .detail {
+    position: relative;
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 300ms var(--ease-out),
+      transform 500ms var(--ease-out);
+  }
+
+  :global(.js) .detail[data-active] {
+    opacity: 1;
+    transform: none;
+    transition-delay: 80ms;
+  }
+
+  html:not(.js) .detail {
+    display: none;
+  }
+
+  .d-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: var(--display-m);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variation-settings: 'wdth' 108;
+  }
+
+  .d-title :global(svg) {
+    width: 0.6em;
+    height: 0.6em;
+    color: var(--live);
+    flex: none;
+  }
+
+  .d-body {
+    margin-top: 1rem;
+    color: var(--on-cover-2);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  /* The day's timetable. */
+  .table {
+    align-self: center;
+    border-top: 1px solid var(--cover-rule);
+  }
+
+  .table li {
+    display: grid;
+    grid-template-columns: 4.25rem 1fr;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--cover-rule);
+    color: var(--on-cover-3);
+    transition: color 300ms ease;
+  }
+
+  .table li .t {
+    color: inherit;
+  }
+
+  .e-title {
+    font-weight: 600;
+    font-size: var(--step-0);
+    position: relative;
+  }
+
+  .table li[data-past] {
+    color: var(--on-cover-2);
+  }
+
+  .table li[data-current] {
+    color: var(--on-cover);
+  }
+
+  .table li[data-current] .e-title::before {
+    content: '';
+    position: absolute;
+    left: -1.1rem;
+    top: 0.5em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--live);
+  }
+
+  html:not(.js) .table li {
+    color: var(--on-cover);
+  }
+
+  /* The day rule. */
+  .rule {
+    grid-column: 1 / -1;
+    padding-top: 1.5rem;
+  }
+
+  html:not(.js) .rule {
+    display: none;
+  }
+
+  .rail {
+    position: relative;
+    height: 2.5rem;
+    border-top: 1px solid var(--cover-rule);
+  }
+
+  .tick {
+    position: absolute;
+    top: 0;
+    height: 0.6rem;
+    border-left: 1px solid var(--cover-rule);
+  }
+
+  .tick .serial {
+    position: absolute;
+    top: 0.85rem;
+    left: 0;
+    translate: -50% 0;
+    font-size: 0.6875rem;
+    color: var(--on-cover-3);
+  }
+
+  .pip {
+    position: absolute;
+    top: -4px;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    border-radius: 50%;
+    background: var(--on-cover-3);
+  }
+
+  .done {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 2px;
+    background: var(--on-cover);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  .head {
+    position: absolute;
+    top: -7px;
+    left: 0;
+    width: 13px;
+    height: 13px;
+    margin-left: -6.5px;
+    border-radius: 50%;
+    background: var(--live);
+    box-shadow: 0 0 0 4px var(--cover);
+  }
+
+  @media (max-width: 900px) {
+    .stage {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .table {
+      display: none;
+    }
+    html:not(.js) .table {
+      display: block;
+    }
+    .now {
+      align-self: center;
+    }
+    .tick:nth-child(even) .serial {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .track {
+      height: auto;
+    }
+
+    .stage,
+    :global(.js) .stage {
+      position: relative;
+      top: auto;
+      display: block;
+      height: auto;
+      overflow: visible;
+      padding: 0 var(--gutter);
+    }
+
+    .now,
+    .rule {
+      display: none;
+    }
+
+    .table,
+    :global(.js) .table {
+      display: block;
+    }
+
+    .table li {
+      color: var(--on-cover);
+    }
+  }
+</style>
+
+<script>
+  import { onScroll } from '../scripts/scroll';
+
+  const track = document.querySelector<HTMLElement>('[data-day]')!;
+  const START = Number(track.dataset.start);
+  const END = Number(track.dataset.end);
+  const clock = track.querySelector<HTMLElement>('[data-clock]')!;
+  const details = [...track.querySelectorAll<HTMLElement>('[data-detail]')];
+  const rows = [...track.querySelectorAll<HTMLElement>('[data-event]')];
+  const at = rows.map((r) => Number(r.dataset.at));
+  const done = track.querySelector<HTMLElement>('[data-done]')!;
+  const head = track.querySelector<HTMLElement>('[data-head]')!;
+  const rail = head.parentElement!;
+
+  let width = rail.clientWidth;
+  addEventListener('resize', () => (width = rail.clientWidth));
+
+  let shownMin = -1;
+  let current = -2;
+
+  onScroll(track, (p) => {
+    // The clock holds for a beat at each end so the first and last events read.
+    const t = Math.min(1, Math.max(0, (p - 0.04) / 0.9));
+    const minutes = Math.round(START + t * (END - START));
+    if (minutes !== shownMin) {
+      shownMin = minutes;
+      const h = String(Math.floor(minutes / 60)).padStart(2, '0');
+      const m = String(minutes % 60).padStart(2, '0');
+      clock.textContent = `${h}:${m}`;
+    }
+    head.style.transform = `translate3d(${t * width}px, 0, 0)`;
+    done.style.transform = `scaleX(${t})`;
+
+    let c = -1;
+    for (let i = 0; i < at.length; i++) if (at[i] <= minutes) c = i;
+    if (c === -1) c = 0;
+    if (c !== current) {
+      current = c;
+      details.forEach((d, i) => d.toggleAttribute('data-active', i === c));
+      rows.forEach((r, i) => {
+        r.toggleAttribute('data-current', i === c);
+        r.toggleAttribute('data-past', i < c);
+      });
+    }
+  });
+</script>

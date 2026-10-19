@@ -1,0 +1,121 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/ui/Icon.astro';
+---
+
+<Base title="Page not found · FlowX365" description="This page is not in the FlowX365 site." noindex>
+  <main id="main" class="missing">
+    <a class="brand" href="/">
+      <img src="/brand/flowx365-mark-96.webp" width="30" height="30" alt="" />
+      <span>FlowX365</span>
+    </a>
+
+    <div class="copy">
+      <p class="serial code">Error 404</p>
+      <h1 class="display-xl">This sheet is missing.</h1>
+      <p class="lede">The page you followed isn’t in this book. It may have moved, or the link may be mistyped.</p>
+      <div class="actions">
+        <a class="btn btn-lg" href="/">Back to the first page <Icon name="arrow-right" /></a>
+        <button class="link-quiet demo-link" type="button" data-demo-trigger>Request a demo</button>
+      </div>
+    </div>
+
+    <span class="missing-edge" aria-hidden="true"></span>
+  </main>
+</Base>
+
+<style>
+  .missing {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 2rem;
+    padding: 1.25rem var(--gutter) 4rem;
+    background: var(--cover);
+    color: var(--on-cover);
+    overflow: hidden;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: max-content;
+    min-height: 44px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1.1875rem;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 115;
+  }
+
+  .brand img {
+    border-radius: 50%;
+  }
+
+  .copy {
+    align-self: center;
+    max-width: 70rem;
+  }
+
+  .code {
+    color: var(--on-cover-3);
+    margin-bottom: 1.5rem;
+  }
+
+  .display-xl {
+    font-size: min(var(--display-xl), 10vw);
+  }
+
+  .lede {
+    margin-top: 2rem;
+    color: var(--on-cover-2);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .actions .link-quiet {
+    color: var(--on-cover);
+  }
+
+  .demo-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  /* The top of an original sheet, where the missing page would have been. */
+  .missing-edge {
+    position: absolute;
+    inset: auto 0 0;
+    height: 2.5rem;
+    background: var(--original);
+  }
+
+  .missing-edge::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 12px;
+    transform: translateY(-50%);
+    background: radial-gradient(circle at 50% 50%, var(--cover) 3.2px, transparent 3.8px) 0 50% / 14px 12px repeat-x;
+  }
+
+  @media (max-width: 760px) {
+    .display-xl {
+      font-size: 15vw;
+    }
+    .actions .btn {
+      flex: 1 1 auto;
+    }
+  }
+</style>

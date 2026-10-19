@@ -1,0 +1,779 @@
+---
+import DocSheet from './DocSheet.astro';
+import Icon from './ui/Icon.astro';
+import { docs, stock, inr, total, lines } from '../data/sample';
+
+const steps = [
+  {
+    kind: 'quotation' as const,
+    title: 'Quotation',
+    body: 'Build the quote and pick the customer’s lead once. Nobody is asked for it again.',
+    carried: ['Customer', `Lead ${docs.lead.split('/').pop()}`, `${lines.length} lines`, 'GST'],
+    carriedLabel: 'Written once',
+  },
+  {
+    kind: 'salesOrder' as const,
+    title: 'Sales order',
+    body: 'Convert the quotation. The order is created from it with the same customer, lines and lead, and the quotation is marked Converted.',
+    carried: ['Customer', 'Lead', `${lines.length} lines`, `₹${inr(total)}`],
+    carriedLabel: 'Carried forward',
+  },
+  {
+    kind: 'deliveryNote' as const,
+    title: 'Delivery note',
+    body: 'Pick the sales order and its lines come with it. Stock is reserved when the goods are dispatched, and leaves the books when they are delivered.',
+    carried: ['Customer', 'Lead', 'Items', 'Quantities'],
+    carriedLabel: 'Carried forward',
+  },
+  {
+    kind: 'invoice' as const,
+    title: 'Tax invoice',
+    body: 'Raised from the sales order, line for line. The database refuses any edit that would make the two disagree, and an issued invoice is frozen.',
+    carried: ['Customer', 'Lead', `${lines.length} lines`, `₹${inr(total)}`],
+    carriedLabel: 'Carried forward',
+  },
+];
+
+const trail = [
+  { no: docs.lead, label: 'Lead' },
+  { no: docs.quotation, label: 'Quotation' },
+  { no: docs.salesOrder, label: 'Sales order' },
+  { no: docs.deliveryNote, label: 'Delivery note' },
+  { no: docs.invoice, label: 'Tax invoice' },
+];
+---
+
+<section class="chain" id="chain" data-nav="dark" data-chapter="No. 02 · How it works" aria-labelledby="chain-title">
+  <div class="chain-intro">
+    <h2 class="display-l" id="chain-title" data-reveal="mask">Every document is made from the one before it.</h2>
+    <p class="lede" data-reveal style="--i: 2">
+      Follow one order for {lines.length} lines of electrical goods through FlowX365. Watch what
+      changes from sheet to sheet, and what never does.
+    </p>
+  </div>
+
+  <div class="track" data-chain>
+    <div class="stage" data-step="0">
+      <div class="compact-steps">
+        {
+          steps.map((s, i) => (
+            <article class="compact-step" data-reveal>
+              <div class="compact-copy">
+                <p class="compact-numeral" aria-hidden="true">{i + 1}</p>
+                <h3 class="compact-title display-m">
+                  <span class="visually-hidden">Step {i + 1} of {steps.length}: </span>
+                  {s.title}
+                </h3>
+                <p class="compact-body">{s.body}</p>
+                <div class="compact-carried">
+                  <p class="serial carried-label">{s.carriedLabel}</p>
+                  <ul>
+                    {s.carried.map((c) => (
+                      <li>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <DocSheet kind={s.kind} class="compact-sheet" hidden />
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="panels">
+        {
+          steps.map((s, i) => (
+            <div class="panel" data-panel={i}>
+              <p class="numeral" aria-hidden="true">{i + 1}</p>
+              <h3 class="panel-title display-m">
+                <span class="visually-hidden">Step {i + 1} of {steps.length}: </span>
+                {s.title}
+              </h3>
+              <p class="panel-body">{s.body}</p>
+              <div class="carried">
+                <p class="serial carried-label">{s.carriedLabel}</p>
+                <ul>
+                  {s.carried.map((c) => (
+                    <li>{c}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="desk">
+        <div class="stack">
+          {steps.map((s, i) => <DocSheet kind={s.kind} class="sheet-card" style={`--i: ${i}; z-index: ${10 - i}`} hidden={i > 0} />)}
+        </div>
+
+        <div class="stock" aria-live="polite">
+          <p class="stock-head">
+            <Icon name="box" size={16} />
+            <span>{stock.warehouse}</span>
+            <span class="stock-item">{stock.item.split(',')[0]}</span>
+          </p>
+          <dl>
+            <div>
+              <dt>On hand</dt>
+              <dd class="roll num">
+                <span data-when="dispatched">{stock.before}</span>
+                <span data-when="delivered">{stock.after}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Reserved</dt>
+              <dd class="roll num">
+                <span data-when="dispatched">{stock.before - stock.after}</span>
+                <span data-when="delivered">0</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <ol class="trail" aria-label="Documents in this chain">
+        {
+          trail.map((t, i) => (
+            <li class="node" data-node={i}>
+              <span class="dot" aria-hidden="true" />
+              <span class="node-label">{t.label}</span>
+              <span class="serial node-no">{t.no}</span>
+            </li>
+          ))
+        }
+        <span class="trail-line" aria-hidden="true"><span class="trail-fill"></span></span>
+      </ol>
+    </div>
+  </div>
+
+  <div class="chain-outro">
+    <p class="display-l" data-reveal="mask">One lead. One id. One history.</p>
+    <p class="lede" data-reveal style="--i: 2">
+      Every sales document keeps the lead it started from. Open any one of them and you can see the
+      document it came from and every document it produced.
+    </p>
+  </div>
+</section>
+
+<style>
+  .chain {
+    position: relative;
+    z-index: 1;
+    background: var(--cover-mid);
+    color: var(--on-cover);
+    padding-top: var(--section);
+  }
+
+  .chain-intro,
+  .chain-outro {
+    padding: 0 var(--gutter);
+    max-width: 90rem;
+  }
+
+  .chain-intro .display-l {
+    max-width: 15ch;
+  }
+
+  .chain .lede {
+    color: var(--on-cover-2);
+    margin-top: 2rem;
+  }
+
+  .chain-outro {
+    padding-top: clamp(3rem, 8vw, 8rem);
+    padding-bottom: var(--section);
+  }
+
+  .chain-outro .display-l {
+    max-width: 13ch;
+  }
+
+  /* ── The pinned stage ─────────────────────────────────────── */
+  .track {
+    margin-top: clamp(3rem, 8vw, 7rem);
+  }
+
+  :global(.js) .track {
+    height: 420vh;
+    height: 420svh;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    column-gap: clamp(2rem, 5vw, 6rem);
+    padding: calc(var(--nav-h) + 1.5rem) var(--gutter) 1.5rem;
+  }
+
+  .compact-steps {
+    display: none;
+  }
+
+  :global(.js) .stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .panels {
+    position: relative;
+    align-self: center;
+  }
+
+  :global(.js) .panel {
+    position: absolute;
+    inset: auto 0;
+    top: 50%;
+    translate: 0 -50%;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 350ms var(--ease-out),
+      transform 600ms var(--ease-out);
+    pointer-events: none;
+  }
+
+  :global(.js) .panel[data-active] {
+    opacity: 1;
+    transform: none;
+    transition-delay: 120ms;
+  }
+
+  html:not(.js) .panel + .panel {
+    margin-top: 3rem;
+  }
+
+  .numeral {
+    font-size: clamp(5rem, 2rem + 11vw, 12.5rem);
+    font-weight: 800;
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    font-variation-settings: 'wdth' 125;
+    color: var(--original);
+  }
+
+  [data-panel='1'] .numeral {
+    color: var(--duplicate);
+  }
+
+  [data-panel='2'] .numeral {
+    color: var(--triplicate);
+  }
+
+  .panel-title {
+    margin-top: 0.3em;
+  }
+
+  .panel-body {
+    margin-top: 1.1rem;
+    color: var(--on-cover-2);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    max-width: 30ch;
+    text-wrap: pretty;
+  }
+
+  .carried {
+    margin-top: 1.75rem;
+  }
+
+  .carried-label {
+    color: var(--on-cover-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.6875rem;
+  }
+
+  .carried ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+  }
+
+  .carried li {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid rgb(185 192 208 / 0.35);
+    border-radius: 6px;
+    color: var(--on-cover);
+  }
+
+  /* ── The desk: sheets of the pad ─────────────────────────────── */
+  .desk {
+    position: relative;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    min-height: 0;
+  }
+
+  .stack {
+    position: relative;
+    width: min(100%, 40rem);
+    display: grid;
+  }
+
+  .stack :global(.sheet-card) {
+    grid-area: 1 / 1;
+    transform-origin: 30% 100%;
+  }
+
+  :global(.js) .stack :global(.sheet-card) {
+    transition: transform 900ms var(--ease-sheet), opacity 600ms var(--ease-out);
+    will-change: transform;
+  }
+
+  html:not(.js) .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Stock readout, shown while the delivery note is on top. */
+  .stock {
+    position: absolute;
+    right: 0;
+    bottom: 6%;
+    width: min(18rem, 60%);
+    padding: 1rem 1.1rem;
+    background: var(--cover);
+    color: var(--on-cover);
+    border: 1px solid var(--cover-rule);
+    border-radius: 10px;
+    box-shadow: 0 20px 40px -16px rgb(0 0 0 / 0.6);
+    z-index: 20;
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition:
+      opacity 400ms var(--ease-out),
+      transform 500ms var(--ease-out);
+    pointer-events: none;
+  }
+
+  .stage[data-step='2'] .stock {
+    opacity: 1;
+    transform: none;
+  }
+
+  html:not(.js) .stock {
+    display: none;
+  }
+
+  .stock-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .stock-item {
+    width: 100%;
+    font-weight: 400;
+    color: var(--on-cover-2);
+  }
+
+  .stock dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed var(--cover-rule);
+  }
+
+  .stock dt {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--on-cover-3);
+  }
+
+  .roll {
+    position: relative;
+    height: 1.15em;
+    overflow: hidden;
+    font-size: var(--step-2);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 110;
+    margin-top: 0.2rem;
+  }
+
+  .roll span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    line-height: 1.15;
+    transition: transform 500ms var(--ease-out);
+  }
+
+  .roll [data-when='delivered'] {
+    transform: translateY(110%);
+    color: var(--live);
+  }
+
+  :global([data-dn-state='delivered']) .roll [data-when='dispatched'] {
+    transform: translateY(-110%);
+  }
+
+  :global([data-dn-state='delivered']) .roll [data-when='delivered'] {
+    transform: none;
+  }
+
+  /* ── Trail: the chain of document numbers ─────────────────── */
+  .trail {
+    grid-column: 1 / -1;
+    position: relative;
+    z-index: 30;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+    padding-top: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  /* The documents may fan below their grid row on short desktop screens.
+     Keep the progress rail on a solid foreground band so every future step
+     stays legible without flattening the paper stack itself. */
+  .trail::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 calc(-1 * var(--gutter)) -1.5rem;
+    background: var(--cover-mid);
+  }
+
+  html:not(.js) .trail {
+    display: none;
+  }
+
+  .trail-line {
+    position: absolute;
+    top: 1.25rem;
+    left: 0.35rem;
+    right: 0;
+    height: 1px;
+    background: var(--cover-rule);
+    translate: 0 5px;
+  }
+
+  .trail-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--on-cover);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 900ms var(--ease-sheet);
+  }
+
+  .node {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.2rem;
+    color: var(--on-cover-3);
+    transition: color 300ms ease;
+  }
+
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--cover-mid);
+    border: 1.5px solid var(--on-cover-3);
+    margin-bottom: 0.5rem;
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      transform 300ms var(--ease-out);
+  }
+
+  .node-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .node-no {
+    font-size: 0.75rem;
+  }
+
+  .node[data-reached] {
+    color: var(--on-cover);
+  }
+
+  .node[data-reached] .dot {
+    background: var(--on-cover);
+    border-color: var(--on-cover);
+  }
+
+  .node[data-current] .dot {
+    background: var(--live);
+    border-color: var(--live);
+    transform: scale(1.25);
+  }
+
+  /* At the narrowest two-column laptop size the full-size sheet is taller
+     than the space above the rail. Keep its footer in the document area while
+     preserving the same fanned transforms on the sheets themselves. */
+  @media (min-width: 901px) and (max-width: 1100px) and (max-height: 820px) {
+    .desk {
+      transform: translateY(-1.25rem) scale(0.9);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .stage {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      row-gap: 1rem;
+      padding-top: calc(var(--nav-h) + 0.75rem);
+    }
+
+    .panels {
+      align-self: start;
+      min-height: 10.5rem;
+    }
+
+    :global(.js) .panel {
+      top: 0;
+      translate: none;
+    }
+
+    .panel {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 1rem;
+      align-items: end;
+    }
+
+    .numeral {
+      grid-row: 1;
+      font-size: 4.5rem;
+    }
+
+    .panel-title {
+      grid-row: 1;
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    .panel-body {
+      grid-column: 1 / -1;
+      font-size: 1rem;
+      margin-top: 0.75rem;
+      max-width: none;
+    }
+
+    .carried {
+      display: none;
+    }
+
+    .desk {
+      align-items: start;
+    }
+
+    .stock {
+      right: 0.5rem;
+      bottom: 0.5rem;
+      width: min(15rem, 70%);
+    }
+
+    .trail {
+      gap: 0.4rem;
+      margin-top: 0;
+    }
+
+    .node-no {
+      font-size: 0.625rem;
+    }
+
+    .node-label {
+      font-size: 0.6875rem;
+      line-height: 1.2;
+    }
+  }
+
+  @media (max-width: 719px) {
+    .node-no {
+      display: none;
+    }
+  }
+
+  /* Phones: the step numeral carries the position; the sheet gets the room. */
+  @media (max-width: 600px) {
+    .trail {
+      display: none;
+    }
+    .stage {
+      grid-template-rows: auto minmax(0, 1fr);
+      padding-bottom: 1rem;
+    }
+  }
+
+  /* Short phones cannot hold a pinned heading and document at once. Pair each
+     explanation with its sheet in natural flow instead. Reduced-motion users
+     receive the same complete, non-pinned presentation at every width. */
+  @media (prefers-reduced-motion: reduce), (max-width: 600px) and (max-height: 820px) {
+    :global(.js) .track {
+      height: auto;
+    }
+
+    .stage,
+    :global(.js) .stage {
+      position: relative;
+      top: auto;
+      display: block;
+      height: auto;
+      overflow: visible;
+      padding: 0 var(--gutter);
+    }
+
+    .panels,
+    .desk,
+    .trail {
+      display: none;
+    }
+
+    .compact-steps {
+      display: grid;
+      gap: clamp(4rem, 14vw, 6rem);
+    }
+
+    .compact-step {
+      display: grid;
+      gap: 1.5rem;
+      min-width: 0;
+    }
+
+    .compact-copy {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: 1rem;
+      align-items: end;
+    }
+
+    .compact-numeral {
+      color: var(--original);
+      font-size: clamp(4rem, 22vw, 6rem);
+      font-weight: 800;
+      font-variation-settings: 'wdth' 125;
+      letter-spacing: -0.05em;
+      line-height: 0.8;
+    }
+
+    .compact-step:nth-child(2) .compact-numeral {
+      color: var(--duplicate);
+    }
+
+    .compact-step:nth-child(3) .compact-numeral {
+      color: var(--triplicate);
+    }
+
+    .compact-title {
+      margin: 0;
+      font-size: clamp(2rem, 10vw, 3.25rem);
+    }
+
+    .compact-body,
+    .compact-carried {
+      grid-column: 1 / -1;
+    }
+
+    .compact-body {
+      margin-top: 0.9rem;
+      color: var(--on-cover-2);
+      font-size: 1rem;
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
+
+    .compact-carried {
+      margin-top: 1.25rem;
+    }
+
+    .compact-carried ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+
+    .compact-carried li {
+      padding: 0.3rem 0.6rem;
+      border: 1px solid rgb(185 192 208 / 0.35);
+      border-radius: 6px;
+      color: var(--on-cover);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .compact-step :global(.compact-sheet) {
+      width: min(100%, 40rem);
+      margin-inline: auto;
+    }
+  }
+</style>
+
+<script>
+  import { onScroll } from '../scripts/scroll';
+
+  const track = document.querySelector<HTMLElement>('[data-chain]')!;
+  const stage = track.querySelector<HTMLElement>('.stage')!;
+  const panels = [...stage.querySelectorAll<HTMLElement>('.panel')];
+  const sheets = [...stage.querySelectorAll<HTMLElement>('.sheet-card')];
+  const nodes = [...stage.querySelectorAll<HTMLElement>('.node')];
+  const fill = stage.querySelector<HTMLElement>('.trail-fill')!;
+  const STEPS = sheets.length;
+
+  let step = -1;
+  let delivered = false;
+
+  function layout(s: number) {
+    sheets.forEach((el, i) => {
+      const d = i - s;
+      if (d < 0) {
+        // Torn off the pad: lifted up and away, turning as it goes.
+        el.style.transform = `translate3d(-12%, -125%, 0) rotate(-8deg)`;
+        el.style.opacity = '0';
+      } else {
+        // Still on the pad: each copy beneath sits a little lower.
+        el.style.transform = `translate3d(${d * 10}px, ${d * 12}px, 0) rotate(${d * 0.8}deg)`;
+        el.style.opacity = d > 1 ? '0.85' : '1';
+      }
+    });
+    panels.forEach((p, i) => p.toggleAttribute('data-active', i === s));
+    nodes.forEach((n, i) => {
+      // Node 0 is the lead, which exists before the first sheet.
+      n.toggleAttribute('data-reached', i <= s + 1);
+      n.toggleAttribute('data-current', i === s + 1);
+    });
+    fill.style.transform = `scaleX(${(s + 1) / (nodes.length - 1)})`;
+  }
+
+  onScroll(track, (p) => {
+    const raw = p * STEPS;
+    const s = Math.min(STEPS - 1, Math.floor(raw));
+    if (s !== step) {
+      step = s;
+      stage.dataset.step = String(s);
+      layout(s);
+    }
+    const isDelivered = s === 2 && raw - s > 0.5;
+    if (isDelivered !== delivered) {
+      delivered = isDelivered;
+      stage.dataset.dnState = delivered ? 'delivered' : 'dispatched';
+    }
+  });
+
+  layout(0);
+</script>

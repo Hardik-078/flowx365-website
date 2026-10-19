@@ -1,0 +1,313 @@
+---
+import Icon from './ui/Icon.astro';
+
+const copies = [
+  { n: 3, label: 'Triplicate' },
+  { n: 2, label: 'Duplicate' },
+  { n: 1, label: 'Original' },
+];
+---
+
+<section class="hero" id="top" data-nav="dark" aria-labelledby="hero-title">
+  <div class="hero-dim" aria-hidden="true"></div>
+
+  <h1 class="title display-xl" id="hero-title">
+    {
+      copies.map((c) => (
+        <span class={`copy copy-${c.n}`} aria-hidden={c.n === 1 ? undefined : 'true'} data-copy={c.n}>
+          <span class="line" style="--l: 0"><span>Write it</span></span> <span class="line" style="--l: 1"><span>once.</span></span>
+          <span class="copy-label serial" aria-hidden="true">
+            {c.label}
+          </span>
+        </span>
+      ))
+    }
+  </h1>
+
+  <div class="foot" data-hero-foot>
+    <p class="meta form-head">Business management for growing Indian businesses<br />Web &amp; Android</p>
+    <div class="pitch">
+      <p class="lede">
+        FlowX365 runs your sales, purchase, stock and team on one connected chain of documents.
+        Every quotation, order, delivery note and invoice is made from the one before it, so the
+        same order is never typed twice and the numbers never disagree.
+      </p>
+      <div class="actions">
+        <button class="btn btn-lg" type="button" data-demo-trigger>Request a demo <Icon name="arrow-right" /></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    --peek: clamp(3.5rem, 2.8rem + 2vw, 5rem);
+    position: sticky;
+    top: 0;
+    min-height: max(34rem, 100vh);
+    min-height: max(34rem, 100svh);
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    row-gap: clamp(1.5rem, 4vh, 3rem);
+    padding: calc(var(--nav-h) + clamp(1rem, 4vh, 3rem)) var(--gutter) calc(var(--peek) + clamp(1.5rem, 5vh, 3.5rem));
+    background: var(--cover);
+    color: var(--on-cover);
+    overflow: clip;
+    z-index: 0;
+  }
+
+  /* Darkens as the first sheet slides over the cover. */
+  .hero-dim {
+    position: absolute;
+    inset: 0;
+    background: var(--cover-deep);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+    transition: opacity 700ms var(--ease-out);
+  }
+
+  .title {
+    position: relative;
+    align-self: start;
+    font-size: min(var(--display-xl), 25svh);
+    margin: 0;
+    transition: transform 1100ms var(--ease-out);
+  }
+
+  .copy {
+    display: block;
+    width: max-content;
+  }
+
+  .copy .line {
+    display: block;
+  }
+
+  .copy-1 {
+    position: relative;
+    z-index: 2;
+    color: var(--original);
+  }
+
+  .copy-2,
+  .copy-3 {
+    position: absolute;
+    inset: 0;
+    user-select: none;
+    transform-origin: 0% 100%;
+    transition:
+      opacity 350ms var(--ease-out),
+      transform 1100ms var(--ease-out);
+  }
+
+  /* The copies beneath stay hidden until the cover lifts. */
+  .copy-2 {
+    z-index: 1;
+    color: var(--duplicate);
+    opacity: 0;
+  }
+
+  .copy-3 {
+    z-index: 0;
+    color: var(--triplicate);
+    opacity: 0;
+  }
+
+  /* On load the headline rises into place, line by line. */
+  :global(.js) .copy-1 .line > span {
+    display: inline-block;
+    animation: rise 1100ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--l) * 110ms);
+  }
+
+  /* The load fade sits on the children, so the scroll lift can own .foot. */
+  :global(.js) .foot > * {
+    animation: fade-up 900ms var(--ease-out) 420ms backwards;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.28em, 0);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+  }
+
+  /* Each copy carries its own printed label, off the end of the last line. */
+  .copy-label {
+    position: absolute;
+    left: calc(100% + 0.9rem);
+    bottom: 0.3em;
+    font-size: clamp(0.6875rem, 0.6rem + 0.3vw, 0.8125rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 400ms var(--ease-out);
+  }
+
+  .copy-1 .copy-label {
+    color: var(--on-cover-2);
+  }
+
+  .foot {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 36rem);
+    gap: 2rem var(--gutter);
+    align-items: end;
+    position: relative;
+    z-index: 2;
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  .meta {
+    color: var(--on-cover-3);
+    line-height: 1.8;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+  }
+
+  .lede {
+    color: var(--on-cover-2);
+    max-width: none;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+    margin-top: 1.75rem;
+  }
+
+  /*
+   * The lift. Triggered, not scrubbed: the moment the reader starts scrolling
+   * the carbon set fans open as one time-based transition, and folds back at
+   * the top. Transform and opacity transitions run off the main thread in every
+   * browser, and once they settle the cover is a single flat layer again, so
+   * the scroll itself costs nothing.
+   */
+  .hero[data-lifted] .title {
+    transform: translate3d(0, -4vh, 0);
+  }
+
+  .hero[data-lifted] .copy-2 {
+    opacity: 1;
+    transform: translate3d(0, 0.02em, 0) rotate(1.6deg);
+  }
+
+  .hero[data-lifted] .copy-3 {
+    opacity: 1;
+    transform: translate3d(0, 0.04em, 0) rotate(3.2deg);
+    transition-delay: 60ms;
+  }
+
+  .hero[data-lifted] .copy-label {
+    opacity: 1;
+    transition-delay: 300ms;
+  }
+
+  /* Once the first sheet is well over the cover, the cover recedes. */
+  .hero[data-covered] .foot {
+    opacity: 0;
+  }
+
+  .hero[data-covered] .hero-dim {
+    opacity: 0.6;
+  }
+
+  @media (max-width: 900px) {
+    .copy-label {
+      display: none;
+    }
+    .foot {
+      grid-template-columns: 1fr;
+    }
+    .meta {
+      order: 2;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .hero {
+      padding-top: calc(var(--nav-h) + 1.25rem);
+      padding-bottom: calc(var(--peek) + 1.5rem);
+    }
+    .title {
+      font-size: min(21.5vw, 17svh);
+      line-height: 0.86;
+    }
+    .copy .line {
+      display: inline;
+    }
+    .copy {
+      width: auto;
+      max-width: 100%;
+    }
+    .meta {
+      display: none;
+    }
+    .actions {
+      margin-top: 1.25rem;
+    }
+    .actions .btn {
+      flex: 1 1 auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .title,
+    .copy-2,
+    .copy-3,
+    .copy-label,
+    .foot,
+    .hero-dim {
+      transition: none;
+    }
+
+    :global(.js) .copy-1 .line > span,
+    :global(.js) .foot > * {
+      animation: none;
+    }
+
+    .copy-2,
+    .copy-3 {
+      display: none;
+    }
+
+    .hero[data-lifted] .title {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // Two moments, read from an IntersectionObserver rather than per-frame
+  // scroll math: "lifted" as soon as the reader starts scrolling, "covered"
+  // once the first sheet is about halfway over the cover.
+  const hero = document.querySelector<HTMLElement>('.hero')!;
+  const sentinel = document.querySelector<HTMLElement>('.hero-sentinel');
+
+  if (sentinel) {
+    // The sentinel is 80svh tall and starts at the top of the page, so its
+    // visible ratio is 1 - scrollY / 80svh.
+    const LIFT = 0.95; // about 4svh of scroll
+    const COVER = 0.45; // about 44svh of scroll
+    new IntersectionObserver(
+      ([entry]) => {
+        const r = entry.isIntersecting ? entry.intersectionRatio : 0;
+        hero.toggleAttribute('data-lifted', r < LIFT);
+        hero.toggleAttribute('data-covered', r < COVER);
+      },
+      { threshold: [COVER, LIFT, 1] },
+    ).observe(sentinel);
+  }
+</script>

@@ -1,0 +1,433 @@
+---
+import Icon from './ui/Icon.astro';
+
+const chapters = [
+  { id: 'what', label: 'What it is' },
+  { id: 'chain', label: 'How it works' },
+  { id: 'product', label: 'Leads' },
+  { id: 'tracker', label: 'Quotes to orders' },
+  { id: 'stock', label: 'Purchase & stock' },
+  { id: 'print', label: 'Printing' },
+  { id: 'day', label: 'A day' },
+  { id: 'questions', label: 'Questions' },
+  { id: 'details', label: 'Details' },
+];
+
+const primary = [
+  { href: '#chain', label: 'How it works' },
+  { href: '#product', label: 'Product' },
+  { href: '#day', label: 'A day' },
+  { href: '#questions', label: 'Questions' },
+];
+---
+
+<header class="nav" data-theme="dark" data-quiet="false">
+  <div class="nav-bar">
+    <a class="brand" href="#top" aria-label="FlowX365, back to top">
+      <img src="/brand/flowx365-mark-96.webp" width="30" height="30" alt="" />
+      <span class="wordmark">FlowX365</span>
+    </a>
+
+    <nav class="links" aria-label="Primary">
+      <ul>
+        {primary.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <p class="where serial" aria-live="polite"><span data-where></span></p>
+
+    <div class="end">
+      <button class="contents-btn" type="button" aria-expanded="false" aria-controls="contents" aria-label="Contents">
+        <span class="cb-label">Contents</span>
+        <Icon name="chevron" size={16} class="cb-chev" />
+        <Icon name="menu" size={22} class="cb-menu" />
+      </button>
+      <button class="btn cta" type="button" data-demo-trigger>Get in touch</button>
+    </div>
+  </div>
+
+  <div class="contents" id="contents" hidden>
+    <ol>
+      {
+        chapters.map((c, i) => (
+          <li>
+            <a href={`#${c.id}`}>
+              <span class="serial">No. {String(i + 1).padStart(2, '0')}</span>
+              <span>{c.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</header>
+
+<style>
+  .nav {
+    --fg: var(--ink);
+    --fg-2: var(--ink-3);
+    --bg: transparent;
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    color: var(--fg);
+    transition: color 250ms ease;
+  }
+
+  .nav[data-theme='dark'] {
+    --fg: var(--on-cover);
+    --fg-2: var(--on-cover-2);
+  }
+
+  .nav-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    height: var(--nav-h);
+    padding: 0 var(--gutter);
+  }
+
+  /* The bar's ground follows the sheet beneath it, never glass. */
+  .nav-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bar, transparent);
+    opacity: 0;
+    transition:
+      opacity 300ms ease,
+      background-color 300ms ease;
+  }
+
+  .nav[data-quiet='true'] .nav-bar::before {
+    opacity: 1;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    flex: none;
+    min-height: 44px;
+  }
+
+  .brand img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+  .wordmark {
+    font-weight: 800;
+    font-size: 1.1875rem;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 115;
+  }
+
+  .links ul {
+    display: flex;
+    gap: clamp(1rem, 2.2vw, 2rem);
+  }
+
+  .links a {
+    display: inline-block;
+    padding: 0.75rem 0;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--fg-2);
+    text-decoration: none;
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .links a:hover {
+      color: var(--fg);
+    }
+  }
+
+  .links,
+  .where {
+    transition:
+      opacity 300ms var(--ease-out),
+      transform 400ms var(--ease-out);
+  }
+
+  .where {
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
+    color: var(--fg-2);
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .nav[data-quiet='true'] .links {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+      opacity 300ms var(--ease-out),
+      transform 400ms var(--ease-out),
+      visibility 0s 300ms;
+  }
+
+  .nav[data-quiet='true'] .where {
+    opacity: 1;
+    transform: none;
+  }
+
+  .end {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 1.8vw, 1.5rem);
+    margin-left: auto;
+  }
+
+  .cta {
+    min-height: 2.625rem;
+    padding: 0 1.1rem;
+    font-size: 0.9375rem;
+  }
+
+  .contents-btn {
+    display: none;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    padding: 0 0.25rem;
+    background: none;
+    border: 0;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+
+  .contents-btn :global(.cb-chev) {
+    transition: transform 250ms var(--ease-out);
+  }
+
+  .contents-btn[aria-expanded='true'] :global(.cb-chev) {
+    transform: rotate(180deg);
+  }
+
+  .contents-btn :global(.cb-menu) {
+    display: none;
+  }
+
+  .nav[data-quiet='true'] .contents-btn {
+    display: inline-flex;
+  }
+
+  /* Contents: the chapter manifest. */
+  .contents {
+    position: absolute;
+    top: calc(var(--nav-h) - 0.25rem);
+    right: var(--gutter);
+    width: min(22rem, calc(100vw - 2 * var(--gutter)));
+    padding: 0.75rem;
+    background: var(--original);
+    color: var(--ink);
+    border-radius: 12px;
+    box-shadow:
+      0 1px 2px rgb(15 21 32 / 0.1),
+      0 24px 48px -16px rgb(15 21 32 / 0.35);
+    transform-origin: top right;
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .contents[data-open='false'] {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+
+  .contents a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    padding: 0.7rem 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 550;
+  }
+
+  .contents a .serial {
+    color: var(--ink-3);
+  }
+
+  .contents a[aria-current='true'] {
+    background: var(--carbon-soft);
+    color: var(--carbon);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contents a:hover {
+      background: rgb(17 24 39 / 0.05);
+    }
+  }
+
+  @media (max-width: 1080px) {
+    .links {
+      display: none;
+    }
+    .contents-btn {
+      display: inline-flex;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .where {
+      display: none;
+    }
+    .wordmark {
+      font-size: 1.0625rem;
+    }
+    .cta {
+      padding: 0 0.9rem;
+    }
+  }
+
+  /* On phones the manifest opens from a plain menu button. */
+  @media (max-width: 560px) {
+    .wordmark {
+      display: none;
+    }
+    .cb-label,
+    .contents-btn :global(.cb-chev) {
+      display: none;
+    }
+    .contents-btn :global(.cb-menu) {
+      display: block;
+    }
+    .contents-btn {
+      order: 2;
+      min-width: 44px;
+      justify-content: center;
+      padding: 0;
+    }
+    .end {
+      gap: 0.5rem;
+      min-width: 0;
+    }
+    .cta {
+      padding-inline: 0.8rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 340px) {
+    .nav-bar {
+      gap: 0.5rem;
+    }
+    .cta {
+      padding-inline: 0.7rem;
+      font-size: 0.8125rem;
+    }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.nav')!;
+  const bar = nav.querySelector<HTMLElement>('.nav-bar')!;
+  const where = nav.querySelector<HTMLElement>('[data-where]')!;
+  const btn = nav.querySelector<HTMLButtonElement>('.contents-btn')!;
+  const panel = nav.querySelector<HTMLElement>('#contents')!;
+  const items = [...panel.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+
+  // Quiet once the cover has lifted: links give way to the current sheet.
+  // The cover itself is sticky and never leaves, so a sentinel marks it.
+  const sentinel = document.querySelector('.hero-sentinel');
+  const quiet = new IntersectionObserver(([e]) => {
+    nav.dataset.quiet = String(!e.isIntersecting);
+    if (e.isIntersecting) close();
+  });
+  if (sentinel) quiet.observe(sentinel);
+
+  // Whichever section sits under the bar sets its ink and ground. Sheets slide
+  // over the sticky cover, so of all sections under the bar the one latest in
+  // the document is the one on top.
+  const sections = [...document.querySelectorAll<HTMLElement>('[data-nav]')];
+  const under = new Set<HTMLElement>();
+  let current: HTMLElement | null = null;
+
+  function apply() {
+    let top: HTMLElement | null = null;
+    for (const s of sections) if (under.has(s)) top = s;
+    if (!top || top === current) return;
+    current = top;
+    nav.dataset.theme = top.dataset.nav!;
+    bar.style.setProperty('--bar', getComputedStyle(top).backgroundColor);
+    const chapter = top.dataset.chapter;
+    where.textContent = chapter ?? '';
+    items.forEach((a) =>
+      a.setAttribute('aria-current', String(!!chapter && a.hash === `#${top!.id}`)),
+    );
+  }
+
+  let underBar: IntersectionObserver;
+  function watch() {
+    underBar?.disconnect();
+    under.clear();
+    underBar = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const s = e.target as HTMLElement;
+          if (e.isIntersecting) under.add(s);
+          else under.delete(s);
+        }
+        apply();
+      },
+      // A one-pixel line through the middle of the bar.
+      { rootMargin: `-34px 0px -${Math.max(0, window.innerHeight - 35)}px 0px` },
+    );
+    sections.forEach((s) => underBar.observe(s));
+  }
+  watch();
+  // Rebuild only for a real resize. A phone's address bar changes the height
+  // by well under 150px on every swipe and must not churn the observer.
+  let seen = { w: innerWidth, h: innerHeight };
+  let resizeTimer = 0;
+  addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      if (innerWidth === seen.w && Math.abs(innerHeight - seen.h) < 150) return;
+      seen = { w: innerWidth, h: innerHeight };
+      watch();
+    }, 200);
+  });
+
+  function open() {
+    panel.hidden = false;
+    panel.dataset.open = 'false';
+    requestAnimationFrame(() => (panel.dataset.open = 'true'));
+    btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function close() {
+    if (panel.hidden) return;
+    panel.dataset.open = 'false';
+    btn.setAttribute('aria-expanded', 'false');
+    setTimeout(() => {
+      if (btn.getAttribute('aria-expanded') === 'false') panel.hidden = true;
+    }, 220);
+  }
+
+  btn.addEventListener('click', () => (panel.hidden ? open() : close()));
+  items.forEach((a) => a.addEventListener('click', close));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !panel.hidden) {
+      close();
+      btn.focus();
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target as Node)) close();
+  });
+</script>

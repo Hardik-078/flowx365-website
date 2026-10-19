@@ -1,0 +1,472 @@
+---
+import Icon from './ui/Icon.astro';
+import { company, customer, docs, lines, subtotal, cgst, sgst, total, inr, inWords } from '../data/sample';
+
+type Kind = 'quotation' | 'salesOrder' | 'deliveryNote' | 'invoice';
+
+interface Props {
+  kind: Kind;
+  class?: string;
+  style?: string;
+  /** Visual copy only: hidden from assistive tech (the step text narrates it). */
+  hidden?: boolean;
+}
+
+const { kind, class: className, style, hidden = false } = Astro.props;
+
+const meta: Record<Kind, { title: string; no: string; date: string; copy: string; tint: string }> = {
+  quotation: { title: 'Quotation', no: docs.quotation, date: '08 Sep 2026', copy: 'Original', tint: 'original' },
+  salesOrder: { title: 'Sales order', no: docs.salesOrder, date: '11 Sep 2026', copy: 'Duplicate', tint: 'duplicate' },
+  deliveryNote: { title: 'Delivery note', no: docs.deliveryNote, date: '15 Sep 2026', copy: 'Triplicate', tint: 'triplicate' },
+  invoice: { title: 'Tax invoice', no: docs.invoice, date: '15 Sep 2026', copy: 'Original for recipient', tint: 'original' },
+};
+
+const m = meta[kind];
+const priced = kind !== 'deliveryNote';
+---
+
+<article class:list={['doc', className]} data-tint={m.tint} data-kind={kind} style={style} aria-label={hidden ? undefined : `${m.title} ${m.no}`} aria-hidden={hidden ? 'true' : undefined}>
+  <header class="doc-head">
+    <div class="from">
+      <p class="co form-head">{company.name}</p>
+      <p class="co-meta">{company.city} · GSTIN {company.gstin}</p>
+    </div>
+    <div class="title">
+      <p class="form-head doc-title">{m.title}</p>
+      <p class="serial doc-no">{m.no}</p>
+      <p class="doc-date">{m.date}</p>
+    </div>
+  </header>
+
+  <div class="parties">
+    <div>
+      <p class="label">Bill to</p>
+      <p class="carbon party">{customer.name}</p>
+      <p class="carbon sub">{customer.city}</p>
+    </div>
+    <div class="links">
+      <p class="label">Lead</p>
+      <p class="carbon serial chip"><Icon name="link" size={12} />{docs.lead}</p>
+      {
+        kind === 'salesOrder' && (
+          <>
+            <p class="label">Source</p>
+            <p class="serial ref">
+              {docs.quotation} <span class="badge" data-tone="indigo">Converted</span>
+            </p>
+          </>
+        )
+      }
+      {
+        kind === 'deliveryNote' && (
+          <>
+            <p class="label">Against</p>
+            <p class="serial ref">{docs.salesOrder}</p>
+          </>
+        )
+      }
+      {
+        kind === 'invoice' && (
+          <>
+            <p class="label">Against</p>
+            <p class="serial ref">{docs.salesOrder}</p>
+          </>
+        )
+      }
+    </div>
+  </div>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th scope="col" class="c-n">#</th>
+        <th scope="col">Item</th>
+        <th scope="col" class="c-hsn">HSN</th>
+        {
+          priced ? (
+            <>
+              <th scope="col" class="r">Qty</th>
+              <th scope="col" class="r c-rate">Rate</th>
+              <th scope="col" class="r">Amount</th>
+            </>
+          ) : (
+            <>
+              <th scope="col" class="r">Ordered</th>
+              <th scope="col" class="r">Dispatch</th>
+            </>
+          )
+        }
+      </tr>
+    </thead>
+    <tbody class="carbon">
+      {
+        lines.map((l, i) => (
+          <tr>
+            <td class="c-n">{i + 1}</td>
+            <td class="c-item">{l.item}</td>
+            <td class="c-hsn">{l.hsn}</td>
+            {priced ? (
+              <>
+                <td class="r num">{l.qty}</td>
+                <td class="r num c-rate">{inr(l.rate)}</td>
+                <td class="r num">{inr(l.amount)}</td>
+              </>
+            ) : (
+              <>
+                <td class="r num">{l.qty}</td>
+                <td class="r num">{l.qty}</td>
+              </>
+            )}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  {
+    priced ? (
+      <div class="totals">
+        {kind === 'invoice' && (
+          <p class="lock">
+            <Icon name="lock" size={13} />
+            Lines locked to {docs.salesOrder}
+          </p>
+        )}
+        <dl class="carbon">
+          <div><dt>Subtotal</dt><dd class="num">{inr(subtotal)}</dd></div>
+          <div><dt>CGST 9%</dt><dd class="num">{inr(cgst)}</dd></div>
+          <div><dt>SGST 9%</dt><dd class="num">{inr(sgst)}</dd></div>
+          <div class="grand"><dt>Total</dt><dd class="num">₹{inr(total)}</dd></div>
+        </dl>
+        <p class="words carbon">{inWords(total)}</p>
+      </div>
+    ) : (
+      <div class="dispatch">
+        <p class="label">Status</p>
+        <p class="dn-status">
+          <span class="badge" data-tone="amber" data-dn="dispatched">Dispatched</span>
+          <span class="badge" data-tone="green" data-dn="delivered">Delivered</span>
+        </p>
+        <p class="label">Vehicle</p>
+        <p class="serial">OD 02 AX 4417</p>
+      </div>
+    )
+  }
+
+  <footer class="doc-foot">
+    <span class="serial">{m.copy}</span>
+    <span class="serial">Illustrative data</span>
+  </footer>
+</article>
+
+<style>
+  .doc {
+    --tint: var(--original);
+    container-type: inline-size;
+    background: var(--tint);
+    color: var(--ink);
+    padding: clamp(1rem, 4cqi, 1.75rem);
+    border-radius: 3px;
+    font-size: clamp(11.5px, 2.35cqi, 14px);
+    line-height: 1.4;
+    box-shadow:
+      0 1px 1px rgb(0 0 0 / 0.12),
+      0 30px 60px -24px rgb(0 0 0 / 0.55);
+  }
+
+  .doc[data-tint='duplicate'] {
+    --tint: var(--duplicate);
+  }
+
+  .doc[data-tint='triplicate'] {
+    --tint: var(--triplicate);
+  }
+
+  /* Copies beneath the top sheet carry a slightly softer impression. */
+  .doc:not([data-kind='quotation']) .carbon {
+    text-shadow: 0 0 0.6px rgb(47 50 150 / 0.55);
+  }
+
+  .doc-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.9em;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .co {
+    font-size: 1.05em;
+    letter-spacing: 0.02em;
+  }
+
+  .co-meta {
+    color: var(--ink-3);
+    font-size: 0.86em;
+    margin-top: 0.2em;
+  }
+
+  .title {
+    text-align: right;
+    flex: none;
+  }
+
+  .doc-title {
+    font-size: 1.3em;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+
+  .doc-no {
+    font-size: 0.92em;
+    margin-top: 0.25em;
+  }
+
+  .doc-date {
+    color: var(--ink-3);
+    font-size: 0.86em;
+  }
+
+  .parties {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1rem;
+    padding: 0.9em 0;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .label {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+  }
+
+  .party {
+    font-weight: 650;
+    margin-top: 0.15em;
+  }
+
+  .sub {
+    font-size: 0.9em;
+  }
+
+  .links {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3em 0.8em;
+    align-items: center;
+    align-content: start;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    width: max-content;
+    padding: 0.1em 0.45em;
+    border-radius: 4px;
+    background: var(--carbon-soft);
+    font-size: 0.92em;
+  }
+
+  .ref {
+    font-size: 0.92em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
+  }
+
+  .ref .badge {
+    font-size: 0.82em;
+    font-family: var(--font);
+  }
+
+  .items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.4em;
+  }
+
+  .items th {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    text-align: left;
+    padding: 0.7em 0.5em 0.5em 0;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .items td {
+    padding: 0.6em 0.5em 0.6em 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  .items .r {
+    text-align: right;
+  }
+
+  .items tr > :last-child {
+    padding-right: 0;
+  }
+
+  .c-n {
+    width: 1.6em;
+  }
+
+  .c-item {
+    font-weight: 550;
+  }
+
+  .totals {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 15em);
+    gap: 0.5em 1rem;
+    margin-top: 0.9em;
+    align-items: start;
+  }
+
+  .lock {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    align-self: start;
+    width: max-content;
+    max-width: 100%;
+    padding: 0.35em 0.6em;
+    border-radius: 4px;
+    background: var(--ink);
+    color: var(--original);
+    font-weight: 600;
+    font-size: 0.88em;
+  }
+
+  .totals dl {
+    grid-column: 2;
+  }
+
+  .totals dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.18em 0;
+  }
+
+  .totals dt {
+    color: var(--ink-2);
+  }
+
+  .grand {
+    margin-top: 0.3em;
+    padding-top: 0.45em !important;
+    border-top: 2px solid var(--ink);
+    font-weight: 800;
+    font-size: 1.15em;
+  }
+
+  .grand dt {
+    color: var(--carbon) !important;
+  }
+
+  .words {
+    grid-column: 1 / -1;
+    font-size: 0.88em;
+    font-style: italic;
+    padding-top: 0.6em;
+    border-top: 1px solid var(--rule);
+  }
+
+  .dispatch {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5em 1rem;
+    align-items: center;
+    margin-top: 1em;
+  }
+
+  .dn-status {
+    position: relative;
+    height: 1.6em;
+  }
+
+  .dn-status .badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 0.9em;
+    transition:
+      opacity 300ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+
+  .dn-status [data-dn='delivered'] {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  :global([data-dn-state='delivered']) .dn-status [data-dn='delivered'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  :global([data-dn-state='delivered']) .dn-status [data-dn='dispatched'] {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  .doc-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.1em;
+    padding-top: 0.7em;
+    border-top: 1px dashed var(--rule-strong);
+    color: var(--ink-3);
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @container (max-width: 30rem) {
+    .c-hsn,
+    .c-rate {
+      display: none;
+    }
+    .parties {
+      grid-template-columns: 1fr;
+      gap: 0.6em;
+    }
+    .totals {
+      grid-template-columns: 1fr;
+    }
+    .totals dl {
+      grid-column: 1;
+    }
+    .co-meta {
+      display: none;
+    }
+  }
+
+  @container (max-width: 20rem) {
+    .doc-head {
+      flex-direction: column;
+      gap: 0.55em;
+    }
+
+    .title {
+      min-width: 0;
+      flex: auto;
+      text-align: left;
+    }
+
+    .doc-no {
+      overflow-wrap: anywhere;
+    }
+  }
+</style>

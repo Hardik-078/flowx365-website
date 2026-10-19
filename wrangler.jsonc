@@ -1,0 +1,32 @@
+// Cloudflare Workers deploy config: static assets plus the demo-request API.
+// Workers Builds runs `npm run build`, then `npx wrangler deploy` uploads dist/.
+{
+  "name": "flowx365-site",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-09-01",
+  // Served on the account's workers.dev subdomain. To use your own domain, add
+  // "routes": [{ "pattern": "example.com", "custom_domain": true }]. These must
+  // stay in this file: the dashboard toggles are overwritten by every deploy.
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  // RESEND_API_KEY and DEMO_TO_EMAIL are secrets: `npx wrangler secret put <NAME>`.
+  "vars": {
+    // Resend's test sender only delivers to your Resend account's own address.
+    // Switch to an address on a domain you've verified in Resend.
+    "DEMO_FROM_EMAIL": "FlowX365 <onboarding@resend.dev>"
+  },
+  "ratelimits": [
+    {
+      "name": "DEMO_RATE_LIMITER",
+      "namespace_id": "3651001",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import WhatIs from '../components/WhatIs.astro';
+import Chain from '../components/Chain.astro';
+import Crm from '../components/Crm.astro';
+import Tracker from '../components/Tracker.astro';
+import Stock from '../components/Stock.astro';
+import Print from '../components/Print.astro';
+import Day from '../components/Day.astro';
+import Questions from '../components/Questions.astro';
+import Details from '../components/Details.astro';
+import Close from '../components/Close.astro';
+---
+
+<Base>
+  <Nav />
+  <main id="main">
+    <div class="cover-stack">
+      <div class="hero-sentinel" aria-hidden="true"></div>
+      <Hero />
+      <WhatIs />
+    </div>
+    <Chain />
+    <Crm />
+    <Tracker />
+    <Stock />
+    <Print />
+    <Day />
+    <Questions />
+    <Details />
+    <Close />
+  </main>
+</Base>
+
+<style>
+  .cover-stack {
+    position: relative;
+  }
+
+  .hero-sentinel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 80vh;
+    height: 80svh;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { initReveals } from '../scripts/reveal';
+
+  initReveals();
+  document.documentElement.classList.add('js');
+</script>

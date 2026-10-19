@@ -1,0 +1,495 @@
+@import '@fontsource-variable/archivo/standard.css';
+@import '@fontsource-variable/geist-mono/wght.css';
+
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  /* Cover: the bill book's binding. FlowX365 sidebar navy. */
+  --cover-deep: #0b101b;
+  --cover: #0f1520;
+  --cover-mid: #141b30;
+  --cover-high: #1a2340;
+  --on-cover: #f7f8fa;
+  --on-cover-2: #b9c0d0;
+  --on-cover-3: #8a93a8;
+  --cover-rule: rgb(247 248 250 / 0.14);
+
+  /* Sheets: the statutory copies. */
+  --original: #f7f8fa;
+  --duplicate: #f4c7d2;
+  --triplicate: #f4e07e;
+
+  /* Ink */
+  --ink: #111827;
+  --ink-2: #374151;
+  --ink-3: #5b6472;
+  --rule: rgb(17 24 39 / 0.14);
+  --rule-strong: rgb(17 24 39 / 0.32);
+
+  /* Carbon: every line that was carried forward, not typed. */
+  --carbon: #2f3296;
+  --carbon-soft: rgb(47 50 150 / 0.1);
+
+  /* The one live colour. Primary action and the current state only. */
+  --live: #f5820a;
+  --live-deep: #e06b00;
+
+  /* Type */
+  --font: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+
+  --step--1: clamp(0.8125rem, 0.78rem + 0.15vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.1875rem, 1.1rem + 0.45vw, 1.4375rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
+  --display-m: clamp(2.125rem, 1.4rem + 3.3vw, 4.5rem);
+  --display-l: clamp(2.75rem, 1.6rem + 5.6vw, 7.5rem);
+  --display-xl: clamp(4.25rem, 0.8rem + 14.2vw, 16rem);
+
+  /* Space */
+  --gutter: clamp(1rem, 0.4rem + 2.6vw, 3rem);
+  --stub: clamp(0px, -3.2rem + 11vw, 8.5rem);
+  --section: clamp(6rem, 3.5rem + 10vw, 13rem);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --radius-ui: 10px;
+  --nav-h: 4.25rem;
+
+  color-scheme: light;
+  accent-color: var(--live);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-h) + 1rem);
+  background: var(--cover);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  font-variation-settings: 'wdth' 100;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--original);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+figure,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--triplicate);
+  color: var(--ink);
+}
+
+[data-nav='dark'] ::selection {
+  background: var(--live);
+  color: var(--cover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+html {
+  scrollbar-color: var(--cover-high) var(--original);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--live);
+  color: var(--ink);
+  font-weight: 600;
+  border-radius: var(--radius-ui);
+  transform: translateY(-160%);
+  transition: transform 200ms var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* ── Type ───────────────────────────────────────────────────────────────── */
+.display-xl,
+.display-l,
+.display-m {
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.display-xl {
+  font-size: var(--display-xl);
+  line-height: 0.84;
+  letter-spacing: -0.035em;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+}
+
+.display-l {
+  font-size: var(--display-l);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  font-variation-settings: 'wdth' 112;
+}
+
+.display-m {
+  font-size: var(--display-m);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variation-settings: 'wdth' 108;
+}
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.5;
+  max-width: 34em;
+  text-wrap: pretty;
+}
+
+.body {
+  max-width: 38em;
+  text-wrap: pretty;
+}
+
+/* Printed-form header, like TAX INVOICE across the top of a bill. */
+.form-head {
+  font-weight: 700;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Serials, document numbers, times: data, so mono. */
+.serial {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: var(--step--1);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Actions ────────────────────────────────────────────────────────────── */
+.btn {
+  --btn-bg: var(--live);
+  --btn-fg: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 3rem;
+  padding: 0 1.35rem;
+  border: 0;
+  border-radius: var(--radius-ui);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 650;
+  font-variation-settings: 'wdth' 106;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 140ms var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    --btn-bg: #ff9426;
+  }
+}
+
+.btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+
+.btn-lg {
+  min-height: 3.75rem;
+  padding: 0 1.9rem;
+  font-size: var(--step-1);
+  border-radius: 12px;
+}
+
+.link-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-height: 3rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 160ms ease;
+}
+
+.link-quiet svg {
+  width: 1em;
+  height: 1em;
+  transition: transform 200ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link-quiet:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+/* ── Sheet: one page of the bill book ───────────────────────────────────── */
+/* A full-bleed field with a perforated top edge and a counterfoil stub on the
+   left that carries its printed serial. */
+.sheet {
+  --sheet-bg: var(--original);
+  --hole: var(--cover);
+  position: relative;
+  background: var(--sheet-bg);
+  color: var(--ink);
+  isolation: isolate;
+}
+
+.sheet[data-copy='duplicate'] {
+  --sheet-bg: var(--duplicate);
+}
+
+.sheet[data-copy='triplicate'] {
+  --sheet-bg: var(--triplicate);
+}
+
+/* Secondary text on a coloured copy is tinted from that copy, not grey. */
+.sheet[data-copy='duplicate'],
+.doc[data-tint='duplicate'] {
+  --ink-3: #6e3b4a;
+}
+
+.sheet[data-copy='triplicate'],
+.doc[data-tint='triplicate'] {
+  --ink-3: #5c5220;
+}
+
+/* Perforation: a row of punched holes showing what lies beneath. */
+.perf {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 12px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 50% 50%, var(--hole) 3.2px, transparent 3.8px) 0 50% / 14px 12px
+    repeat-x;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.stub {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--stub);
+  border-right: 1.5px dashed var(--rule-strong);
+  pointer-events: none;
+}
+
+.stub .serial {
+  position: sticky;
+  top: calc(var(--nav-h) + 1.5rem);
+  display: block;
+  padding: 2.5rem 0 0 var(--gutter);
+  color: var(--ink-3);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  transform-origin: center;
+  white-space: nowrap;
+  margin-left: auto;
+  margin-right: auto;
+  width: max-content;
+}
+
+.sheet-inner {
+  padding-left: calc(var(--stub) + var(--gutter));
+  padding-right: var(--gutter);
+}
+
+@media (max-width: 760px) {
+  .stub {
+    display: none;
+  }
+}
+
+/* The carbon impression: lines that were carried, not typed. */
+.carbon {
+  color: var(--carbon);
+}
+
+/* ── Reveal (JS-enhanced; content is visible without JS) ────────────────── */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 900ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+.js [data-reveal][data-visible] {
+  opacity: 1;
+  transform: none;
+}
+
+.js [data-reveal='mask'] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 900ms var(--ease-in-out);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+
+.js [data-reveal='mask'][data-visible] {
+  clip-path: inset(0 0 -0.2em 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .js [data-reveal],
+  .js [data-reveal='mask'] {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+}
+
+/* ── Product window: the app, recreated ─────────────────────────────────── */
+/* The app's own tokens, used only inside product scenes. */
+.app {
+  --app-primary: #f5820a;
+  --app-bg: #f0f2f8;
+  --app-card: #ffffff;
+  --app-sidebar: #1a2340;
+  --app-text: #111827;
+  --app-text-2: #374151;
+  --app-muted: #6b7280;
+  --app-line: #e3e7ef;
+  --app-head: #94a3b8;
+  font-family: var(--font);
+  font-variation-settings: 'wdth' 100;
+  color: var(--app-text);
+  background: var(--app-bg);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgb(15 21 32 / 0.08),
+    0 24px 60px -18px rgb(15 21 32 / 0.35);
+  font-size: 13px;
+  line-height: 1.4;
+  container-type: inline-size;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.2em 0.65em;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  background: var(--b-bg, #f3f4f6);
+  color: var(--b-fg, #6b7280);
+}
+
+.badge[data-tone='green'] { --b-bg: #dcfce7; --b-fg: #15803d; }
+.badge[data-tone='blue'] { --b-bg: #dbeafe; --b-fg: #1d4ed8; }
+.badge[data-tone='indigo'] { --b-bg: #e0e7ff; --b-fg: #4338ca; }
+.badge[data-tone='orange'] { --b-bg: #ffedd5; --b-fg: #c2410c; }
+.badge[data-tone='amber'] { --b-bg: #fef3c7; --b-fg: #b45309; }
+.badge[data-tone='purple'] { --b-bg: #f3e8ff; --b-fg: #7e22ce; }
+.badge[data-tone='red'] { --b-bg: #fee2e2; --b-fg: #b91c1c; }
+.badge[data-tone='slate'] { --b-bg: #f1f5f9; --b-fg: #475569; }
+
+.illustrative {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4b5563;
+}

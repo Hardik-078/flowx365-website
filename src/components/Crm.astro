@@ -1,0 +1,653 @@
+---
+import AppFrame from './ui/AppFrame.astro';
+import Icon from './ui/Icon.astro';
+
+const kpis = [
+  { key: 'new', label: 'New leads', n: 18, tone: '#2563eb' },
+  { key: 'contacted', label: 'Contacted', n: 11, tone: '#0891b2' },
+  { key: 'qualified', label: 'Qualified', n: 7, after: 6, tone: '#ea580c' },
+  { key: 'pipeline', label: 'In pipeline', n: 9, after: 10, tone: '#4338ca' },
+  { key: 'won', label: 'Won', n: 5, tone: '#16a34a' },
+  { key: 'lost', label: 'Lost', n: 3, tone: '#dc2626' },
+];
+
+const cards = [
+  { co: 'Mahanadi Cold Storage', who: 'R. Mishra', what: 'Cables & switchgear', budget: '₹5.5L', stage: 'In pipeline', tone: 'indigo', age: '12d old', owner: 'PS' },
+  { co: 'Sethi Agro Foods', who: 'K. Sethi', what: 'Cold room electricals', budget: '₹8.1L', stage: 'Contacted', tone: 'blue', age: '5d old', owner: 'AM', followup: true },
+  { co: 'Puri Beach Residency', who: 'D. Rath', what: 'LED retrofit', budget: '₹2.4L', stage: 'New', tone: 'blue', age: '9d old', owner: 'NK', overdue: true },
+];
+
+const notes = [
+  'Reaching Qualified raises an approval request on its own. Approve, cancel or reject it right here.',
+  'Every count is a filter. Tap Won and the board shows only won leads.',
+  'Cards show each lead’s age and flag follow-ups due and closings that are overdue.',
+];
+---
+
+<section class="sheet crm-section" id="product" data-nav="light" data-chapter="No. 03 · Leads" aria-labelledby="crm-title">
+  <span class="perf" aria-hidden="true" style="--hole: var(--cover-mid)"></span>
+  <div class="stub" aria-hidden="true"><span class="serial">No. 03 · Original</span></div>
+
+  <div class="sheet-inner">
+    <h2 class="display-l crm-title" id="crm-title" data-reveal="mask">Every lead, and exactly where it stands.</h2>
+  <div class="layout">
+    <div class="copy">
+      <p class="body lede" data-reveal style="--i: 1">
+        Lead Management puts the whole funnel on one screen: new, contacted, qualified, in pipeline,
+        won and lost. Approving a qualified lead admits it to the sales pipeline, and its id then
+        rides on every document that follows.
+      </p>
+      <ol class="notes">
+        {
+          notes.map((n, i) => (
+            <li data-reveal style={`--i: ${i + 2}`}>
+              <span class="marker" aria-hidden="true">{i + 1}</span>
+              <span>{n}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="visual" data-reveal style="--i: 1">
+      <AppFrame
+        label="FlowX365 Lead Management screen, with illustrative data"
+        group="CRM"
+        items={['Lead Management', 'Lead Approval', 'Sales Pipeline', 'Sales Target & Performance']}
+        active="Lead Management"
+        crumb={['Home', 'CRM', 'Lead Management']}
+        class="crm-app"
+      >
+        <div class="crm" data-crm>
+          <div class="pending">
+            <span class="marker on-ui" aria-hidden="true">1</span>
+            <p class="pending-head">
+              <span>Pending approval</span>
+              <span class="pending-count"><span class="roll"><span data-v="a">2</span><span data-v="b">1</span></span></span>
+            </p>
+            <div class="pending-list">
+              <div class="prow first" data-approve><div class="pclip"><div class="pcard">
+                <div class="pc-main">
+                  <p class="pc-co">Konark Hotels &amp; Resorts</p>
+                  <p class="pc-meta"><span class="serial">AE/26-27/LD/034</span> · Split AC installation · ₹3.2L</p>
+                </div>
+                <span class="badge" data-tone="orange">Qualified</span>
+                <span class="ibtn ok" data-press><Icon name="check" size={15} /></span>
+                <span class="ibtn no"><Icon name="ban" size={14} /></span>
+                <span class="ibtn more"><Icon name="more" size={15} /></span>
+              </div></div></div>
+              <div class="prow"><div class="pclip"><div class="pcard">
+                <div class="pc-main">
+                  <p class="pc-co">Utkal Poly Industries</p>
+                  <p class="pc-meta"><span class="serial">AE/26-27/LD/036</span> · Plant rewiring · ₹11.4L</p>
+                </div>
+                <span class="badge" data-tone="orange">Qualified</span>
+                <span class="ibtn ok"><Icon name="check" size={15} /></span>
+                <span class="ibtn no"><Icon name="ban" size={14} /></span>
+                <span class="ibtn more"><Icon name="more" size={15} /></span>
+              </div></div></div>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <span class="marker on-ui" aria-hidden="true">2</span>
+            {
+              kpis.map((k) => (
+                <div class="kpi" data-kpi={k.key} style={`--tone: ${k.tone}`}>
+                  <span class="kpi-icon" />
+                  <p class="kpi-label">{k.label}</p>
+                  <p class="kpi-n num">
+                    {k.after !== undefined ? (
+                      <span class="roll">
+                        <span data-v="a">{k.n}</span>
+                        <span data-v="b">{k.after}</span>
+                      </span>
+                    ) : (
+                      k.n
+                    )}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+
+          <div class="stages" aria-hidden="true">
+            {['All', 'New', 'Contacted', 'Qualified', 'In pipeline', 'Won', 'Lost'].map((s, i) => (
+              <span class:list={['pill', { on: i === 0 }]}>{s}</span>
+            ))}
+          </div>
+
+          <div class="board">
+            <span class="marker on-ui" aria-hidden="true">3</span>
+            <div class="scard arriving" data-arrive>
+              <div class="sc-top">
+                <p class="sc-co">Konark Hotels &amp; Resorts</p>
+                <span class="badge" data-tone="indigo">In pipeline</span>
+              </div>
+              <p class="sc-who">A. Das · Split AC installation</p>
+              <div class="sc-foot">
+                <span class="sc-budget">₹3.2L</span>
+                <span class="sc-age">Approved just now</span>
+                <span class="owner">SM</span>
+              </div>
+            </div>
+            {
+              cards.map((c) => (
+                <div class="scard">
+                  <div class="sc-top">
+                    <p class="sc-co">{c.co}</p>
+                    <span class="badge" data-tone={c.tone}>
+                      {c.stage}
+                    </span>
+                  </div>
+                  <p class="sc-who">
+                    {c.who} · {c.what}
+                  </p>
+                  <div class="sc-foot">
+                    <span class="sc-budget">{c.budget}</span>
+                    <span class="sc-age">
+                      {c.followup && <span class="fdot" title="Follow-up due" />}
+                      {c.age}
+                    </span>
+                    {c.overdue && (
+                      <span class="badge" data-tone="red">
+                        Overdue
+                      </span>
+                    )}
+                    <span class="owner">{c.owner}</span>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+          <p class="illustrative">Illustrative data</p>
+        </div>
+      </AppFrame>
+    </div>
+  </div>
+  </div>
+</section>
+
+<style>
+  .crm-section {
+    padding: var(--section) 0;
+    overflow-x: clip;
+  }
+
+  .crm-title {
+    max-width: 15ch;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(17rem, 25rem) minmax(0, 1fr);
+    gap: clamp(2.5rem, 5vw, 6rem);
+    align-items: start;
+    margin-top: clamp(3rem, 6vw, 5.5rem);
+  }
+
+  .copy {
+    position: sticky;
+    top: calc(var(--nav-h) + 2.5rem);
+  }
+
+  .copy .lede {
+    color: var(--ink-2);
+  }
+
+  .notes {
+    margin-top: 2.25rem;
+    display: grid;
+    gap: 1.1rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+  }
+
+  .notes li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: baseline;
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .marker {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--carbon);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex: none;
+    translate: 0 -1px;
+  }
+
+  .marker.on-ui {
+    position: absolute;
+    top: -0.65rem;
+    left: -0.65rem;
+    z-index: 3;
+    box-shadow: 0 0 0 3px #fff;
+  }
+
+  /* The screen runs off the sheet's right edge, and stops there. */
+  .visual {
+    margin-right: calc(-1 * var(--gutter));
+  }
+
+  .visual :global(.app) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  /* ── The screen ─────────────────────────────────────────── */
+  .crm {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pending,
+  .kpis,
+  .board {
+    position: relative;
+  }
+
+  .pending {
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    padding: 0.75rem;
+  }
+
+  .pending-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 0 0.25rem 0.6rem;
+  }
+
+  .pending-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.4rem;
+    height: 1.25rem;
+    padding: 0 0.35rem;
+    border-radius: 10px;
+    background: #ffedd5;
+    color: #c2410c;
+    font-size: 11px;
+  }
+
+  .pending-list {
+    display: grid;
+  }
+
+  /* Each pending row can fold away once it is approved. */
+  .prow {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition:
+      grid-template-rows 500ms var(--ease-out),
+      opacity 300ms var(--ease-out);
+  }
+
+  .prow + .prow .pcard {
+    margin-top: 0.5rem;
+  }
+
+  .pclip {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  [data-crm][data-state='gone'] .prow.first {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  [data-crm][data-state='gone'] .prow.first + .prow .pcard {
+    margin-top: 0;
+  }
+
+  .pcard {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--app-line);
+    border-radius: 10px;
+    background: #fffaf5;
+    min-width: 0;
+    transition:
+      opacity 400ms var(--ease-out),
+      transform 500ms var(--ease-out);
+  }
+
+  .pc-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pc-co {
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pc-meta {
+    color: var(--app-muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pc-meta .serial {
+    font-size: 11px;
+  }
+
+  .ibtn {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 28px;
+    border-radius: 7px;
+    border: 1px solid var(--app-line);
+    background: #fff;
+    color: var(--app-muted);
+    flex: none;
+    transition:
+      transform 140ms var(--ease-out),
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .ibtn.ok {
+    color: #16a34a;
+    border-color: #bbf7d0;
+  }
+
+  .ibtn.more {
+    border: 0;
+    width: 20px;
+  }
+
+  [data-crm][data-state='press'] [data-press],
+  [data-crm]:is([data-state='done'], [data-state='gone']) [data-press] {
+    background: #16a34a;
+    color: #fff;
+    transform: scale(0.92);
+  }
+
+  [data-crm]:is([data-state='done'], [data-state='gone']) [data-approve] .pcard {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  /* KPI cards, as in the app's command center. */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .kpi {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.55rem;
+    align-items: center;
+    padding: 0.7rem 0.75rem;
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    transition: box-shadow 300ms ease;
+  }
+
+  .kpi-icon {
+    grid-row: 1 / span 2;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--tone) 14%, white);
+    position: relative;
+  }
+
+  .kpi-icon::after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border-radius: 3px;
+    background: var(--tone);
+  }
+
+  .kpi-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--app-head);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .kpi-n {
+    font-size: 21px;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 108;
+    line-height: 1.1;
+  }
+
+  [data-crm]:is([data-state='done'], [data-state='gone']) [data-kpi='pipeline'] {
+    box-shadow: 0 0 0 2px var(--app-primary);
+  }
+
+  /* Two values stacked; the state flips which one shows. */
+  .roll {
+    display: inline-grid;
+    height: 1.15em;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  .roll span {
+    grid-area: 1 / 1;
+    line-height: 1.15;
+    transition: transform 450ms var(--ease-out);
+  }
+
+  .roll [data-v='b'] {
+    transform: translateY(105%);
+  }
+
+  [data-crm]:is([data-state='done'], [data-state='gone']) .roll [data-v='a'] {
+    transform: translateY(-105%);
+  }
+
+  [data-crm]:is([data-state='done'], [data-state='gone']) .roll [data-v='b'] {
+    transform: none;
+  }
+
+  .stages {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    padding: 0.35rem 0.8rem;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid var(--app-line);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--app-text-2);
+  }
+
+  .pill.on {
+    background: #1a2340;
+    border-color: #1a2340;
+    color: #fff;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .scard {
+    padding: 0.8rem 0.9rem;
+    background: #fff;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .sc-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sc-co {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sc-who {
+    color: var(--app-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sc-foot {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.25rem;
+    font-size: 12px;
+  }
+
+  .sc-budget {
+    font-weight: 700;
+  }
+
+  .sc-age {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--app-muted);
+  }
+
+  .fdot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--app-primary);
+  }
+
+  .owner {
+    margin-left: auto;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e0e7ff;
+    color: #4338ca;
+    font-size: 9.5px;
+    font-weight: 700;
+  }
+
+  /* The approved lead arrives on the board. */
+  .arriving {
+    box-shadow: 0 0 0 2px var(--app-primary);
+  }
+
+  :global(.js) [data-arrive] {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    transition:
+      opacity 450ms var(--ease-out),
+      transform 600ms var(--ease-out);
+  }
+
+  :global(.js) [data-crm]:is([data-state='done'], [data-state='gone']) [data-arrive] {
+    opacity: 1;
+    transform: none;
+    transition-delay: 350ms;
+  }
+
+  .crm .illustrative {
+    text-align: right;
+  }
+
+  @container (max-width: 44rem) {
+    .kpis {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .board {
+      grid-template-columns: 1fr;
+    }
+    .board .scard:nth-child(n + 4) {
+      display: none;
+    }
+    .stages {
+      display: none;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .copy {
+      position: static;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .marker.on-ui {
+      top: -0.5rem;
+      left: -0.4rem;
+    }
+  }
+</style>
+
+<script>
+  import { onceVisible } from '../scripts/scroll';
+
+  // Approve the first pending lead: press, clear it from the queue, update the
+  // counts, and bring it onto the board.
+  const crm = document.querySelector<HTMLElement>('[data-crm]');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    crm?.setAttribute('data-state', 'gone');
+  } else {
+    onceVisible(
+      crm,
+      () => {
+        setTimeout(() => crm!.setAttribute('data-state', 'press'), 700);
+        setTimeout(() => crm!.setAttribute('data-state', 'done'), 1050);
+        setTimeout(() => crm!.setAttribute('data-state', 'gone'), 1400);
+      },
+      '0px 0px -30% 0px',
+    );
+  }
+</script>
